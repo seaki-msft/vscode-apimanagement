@@ -71,8 +71,8 @@ export class TokenProvidersTreeItem extends AzureParentTreeItem<IServiceTreeRoot
             try {
                 const apimService = new ApimService(this.root.credentials, this.root.environment.resourceManagerEndpointUrl, this.root.subscriptionId, this.root.resourceGroupName, this.root.serviceName);
                 const tokenProvider = await apimService.createTokenProvider(context.tokenProviderName, context.identityProvider, context.clientId, context.clientSecret, context.scopes, context.parameters);
-                const message = `Successfully created Token service "${tokenProvider.name}". 
-                Please add redirect uri '${tokenProvider.properties.OAuthSettings.RedirectUrl}' to the OAuth application before authorizing connection's.`;
+                const message = `Successfully created authorization provider "${tokenProvider.name}". 
+Please add redirect uri '${tokenProvider.properties.OAuthSettings.RedirectUrl}' to the OAuth application before authorizing connection's.`;
 
                 ext.outputChannel.show();
                 ext.outputChannel.appendLine(message);

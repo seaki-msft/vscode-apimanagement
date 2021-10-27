@@ -17,19 +17,14 @@ export async function authorizeConnection(context: IActionContext, node?: Connec
     }
 
     const extensionId = "ms-azuretools.vscode-apimanagement";
-    const redirectUrl = `vscode://${extensionId}`;
+    const postLoginRedirectUrl = `vscode://${extensionId}`;
 
     const apimService = new ApimService(node.root.credentials, node.root.environment.resourceManagerEndpointUrl, node.root.subscriptionId, node.root.resourceGroupName, node.root.serviceName);
     
     const requestBody: ILoginLinkRequestContract = {
-        parameters: [
-            {
-                parameterName: "token",
-                redirectUrl: redirectUrl
-            }
-        ]
+        postLoginRedirectUrl: postLoginRedirectUrl
     };
 
-    const loginLinks = await apimService.listLoginLinks(node.root.tokenProviderName, node.connectionContract.name, requestBody);
-    vscode.env.openExternal(vscode.Uri.parse(loginLinks.Value[0].Link));
+    const loginLinkResponse = await apimService.getLoginLink(node.root.tokenProviderName, node.connectionContract.name, requestBody);
+    vscode.env.openExternal(vscode.Uri.parse(loginLinkResponse.LoginLink));
 }

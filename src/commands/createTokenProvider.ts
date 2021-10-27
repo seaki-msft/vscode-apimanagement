@@ -21,6 +21,7 @@ export async function createTokenProvider(context: IActionContext & Partial<ITok
 
     const aad = 'aad';
 
+    // TODO(seaki): dynamically fetch this list & its parameter
     const options = [ aad, 'salesforce', 'bitly', 'box', 'facebook,', 'fitbit', 'dropbox', 
     'spotify', 'github', 'google', 'facebook', 'instagram', 'stripe', 'flickr',
     'intuit', 'linkedin', 'mailchimp', 'yammer', 'pinterest',

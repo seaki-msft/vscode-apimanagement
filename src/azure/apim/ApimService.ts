@@ -6,7 +6,7 @@
 import { HttpOperationResponse, ServiceClient } from "@azure/ms-rest-js";
 import { TokenCredentialsBase } from "@azure/ms-rest-nodeauth";
 import { createGenericClient } from "vscode-azureextensionui";
-import { IConnectionContract, IGatewayApiContract, IGatewayContract, ILoginLinkRequestContract, ILoginLinkResponseContract, IMasterSubscription, ITokenProviderContract } from "./contracts";
+import { IConnectionContract, IGatewayApiContract, IGatewayContract, ILoginLinkRequestContract, ILoginLinkResponseContract, IMasterSubscription, ITokenProviderContract, ITokenProviderPropertyContract } from "./contracts";
 
 export class ApimService {
     public baseUrl: string;
@@ -100,7 +100,7 @@ export class ApimService {
         const client: ServiceClient = await createGenericClient(this.credentials);
         const result: HttpOperationResponse = await client.sendRequest({
             method: "GET",
-            url: `${this.baseUrl}/tokenproviders?api-version=${this.tokenServiceApiVersion}`
+            url: `${this.baseUrl}/authorizationProviders?api-version=${this.tokenServiceApiVersion}`
         });
         // tslint:disable-next-line: no-unsafe-any
         return <ITokenProviderContract[]>(result.parsedBody.value);
@@ -110,7 +110,7 @@ export class ApimService {
         const client: ServiceClient = await createGenericClient(this.credentials);
         const result: HttpOperationResponse = await client.sendRequest({
             method: "GET",
-            url: `${this.baseUrl}/tokenproviders/${tokenProviderName}/connections?api-version=${this.tokenServiceApiVersion}`
+            url: `${this.baseUrl}/authorizationProviders/${tokenProviderName}/authorizations?api-version=${this.tokenServiceApiVersion}`
         });
         // tslint:disable-next-line: no-unsafe-any
         return <IConnectionContract[]>(result.parsedBody.value);
@@ -119,20 +119,20 @@ export class ApimService {
     public async createTokenProvider(tokenProviderName:string, identityProvider: string, clientId: string, clientSecret: string, scopes: string = '', parameters : {[name: string]: string;} = {}): Promise<ITokenProviderContract> {
         const client: ServiceClient = await createGenericClient(this.credentials);
 
+        const properties: ITokenProviderPropertyContract = {
+            displayName: tokenProviderName,
+            identityProvider: identityProvider,
+            OAuthSettings : {
+                ClientId: clientId,
+                ClientSecret: clientSecret,
+                Scopes: scopes,
+                Parameters : parameters
+            }
+        }
         const result: HttpOperationResponse = await client.sendRequest({
             method: "PUT",
-            url: `${this.baseUrl}/tokenproviders/${tokenProviderName}?api-version=${this.tokenServiceApiVersion}`,
-            body: {
-                properties: {
-                    oAuthSettings : {
-                        identityProvider: identityProvider,
-                        clientId: clientId,
-                        clientSecret: clientSecret,
-                        scopes: scopes,
-                        parameters : parameters
-                    }
-                },
-            }
+            url: `${this.baseUrl}/authorizationProviders/${tokenProviderName}?api-version=${this.tokenServiceApiVersion}`,
+            body: { properties: properties }
         });
         // tslint:disable-next-line: no-unsafe-any
         return <ITokenProviderContract>(result.parsedBody);
@@ -140,17 +140,10 @@ export class ApimService {
 
     public async createConnection(tokenProviderName: string, connectionName: string): Promise<IConnectionContract> {
         const client: ServiceClient = await createGenericClient(this.credentials);
-
-        var tokenResponse = await this.credentials.getToken();
-
         const result: HttpOperationResponse = await client.sendRequest({
             method: "PUT",
-            url: `${this.baseUrl}/tokenproviders/${tokenProviderName}/connections/${connectionName}?api-version=${this.tokenServiceApiVersion}`,
-            body: {
-                properties: {
-                    tenantId: tokenResponse.tenantId
-                },
-            }
+            url: `${this.baseUrl}/authorizationProviders/${tokenProviderName}/authorizations/${connectionName}?api-version=${this.tokenServiceApiVersion}`,
+            body: {}
         });
         // tslint:disable-next-line: no-unsafe-any
         return <IConnectionContract>(result.parsedBody);
@@ -160,7 +153,7 @@ export class ApimService {
         const client: ServiceClient = await createGenericClient(this.credentials);
         await client.sendRequest({
             method: "DELETE",
-            url: `${this.baseUrl}/tokenproviders/${tokenProviderName}/connections/${connectionName}?api-version=${this.tokenServiceApiVersion}`
+            url: `${this.baseUrl}/authorizationProviders/${tokenProviderName}/authorizations/${connectionName}?api-version=${this.tokenServiceApiVersion}`
         });
     }
 
@@ -168,15 +161,15 @@ export class ApimService {
         const client: ServiceClient = await createGenericClient(this.credentials);
         await client.sendRequest({
             method: "DELETE",
-            url: `${this.baseUrl}/tokenproviders/${tokenProviderName}?api-version=${this.tokenServiceApiVersion}`
+            url: `${this.baseUrl}/authorizationProviders/${tokenProviderName}?api-version=${this.tokenServiceApiVersion}`
         });
     }
 
-    public async listLoginLinks(tokenProviderName: string, connectionName: string, body: ILoginLinkRequestContract) : Promise<ILoginLinkResponseContract> {
+    public async getLoginLink(tokenProviderName: string, connectionName: string, body: ILoginLinkRequestContract) : Promise<ILoginLinkResponseContract> {
         const client: ServiceClient = await createGenericClient(this.credentials);
         const result: HttpOperationResponse = await client.sendRequest({
             method: "POST",
-            url: `${this.baseUrl}/tokenproviders/${tokenProviderName}/connections/${connectionName}/getLoginLinks?api-version=${this.tokenServiceApiVersion}`,
+            url: `${this.baseUrl}/authorizationProviders/${tokenProviderName}/authorizations/${connectionName}/getLoginLinks?api-version=${this.tokenServiceApiVersion}`,
             body: body
         });
         // tslint:disable-next-line: no-unsafe-any

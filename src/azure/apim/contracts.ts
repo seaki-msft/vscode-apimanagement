@@ -54,13 +54,14 @@ export interface ITokenProviderContract {
 }
 
 export interface ITokenProviderPropertyContract {
+    displayName: string;
+    identityProvider: string;
     OAuthSettings: {
-        IdentityProvider: string;
         ClientId: string;
         ClientSecret: string;
         Scopes?: string;
-        Parameters?: {}
         RedirectUrl?: string;
+        Parameters?: {}
     };
 }
 
@@ -74,7 +75,7 @@ export interface IConnectionContract {
 }
 
 export interface IConnectionPropertyContract {
-    Status: string;
+    Status: string; // TODO(seaki): switch to enum?
     Error: {
         Code: string;
         Message: string;
@@ -82,21 +83,9 @@ export interface IConnectionPropertyContract {
 }
 
 export interface ILoginLinkRequestContract {
-    parameters: ILoginLinkInputParameter[];
-}
-
-export interface ILoginLinkInputParameter {
-    parameterName: string;
-    redirectUrl: string;
+    postLoginRedirectUrl: string;
 }
 
 export interface ILoginLinkResponseContract {
-    Value: ILoginLink[];
-}
-
-export interface ILoginLink {
-    Link: string;
-    FirstPartyLoginUri: string;
-    DisplayName: string;
-    Status: string;
+    LoginLink: string;
 }
