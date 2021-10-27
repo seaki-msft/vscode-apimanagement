@@ -7,13 +7,13 @@ import * as vscode from 'vscode';
 import { IActionContext } from "vscode-azureextensionui";
 import { ApimService } from '../azure/apim/ApimService';
 import { ILoginLinkRequestContract } from '../azure/apim/contracts';
-import { ConnectionTreeItem } from "../explorer/ConnectionTreeItem";
+import { AuthorizationTreeItem } from "../explorer/AuthorizationTreeItem";
 import { ext } from "../extensionVariables";
 
-export async function authorizeConnection(context: IActionContext, node?: ConnectionTreeItem): Promise<void> {
+export async function authorizeAuthorization(context: IActionContext, node?: AuthorizationTreeItem): Promise<void> {
     if (!node) {
-        const connectionNode = <ConnectionTreeItem>await ext.tree.showTreeItemPicker(ConnectionTreeItem.contextValue, context);
-        node = connectionNode;
+        const authorizationNode = <AuthorizationTreeItem>await ext.tree.showTreeItemPicker(AuthorizationTreeItem.contextValue, context);
+        node = authorizationNode;
     }
 
     const extensionId = "ms-azuretools.vscode-apimanagement";
@@ -25,6 +25,6 @@ export async function authorizeConnection(context: IActionContext, node?: Connec
         postLoginRedirectUrl: postLoginRedirectUrl
     };
 
-    const loginLinkResponse = await apimService.getLoginLink(node.root.tokenProviderName, node.connectionContract.name, requestBody);
+    const loginLinkResponse = await apimService.getLoginLink(node.root.authorizationProviderName, node.authorizationContract.name, requestBody);
     vscode.env.openExternal(vscode.Uri.parse(loginLinkResponse.LoginLink));
 }

@@ -6,22 +6,22 @@
 import { ProgressLocation, window } from "vscode";
 import { AzureParentTreeItem, AzureTreeItem, DialogResponses, UserCancelledError } from "vscode-azureextensionui";
 import { ApimService } from "../azure/apim/ApimService";
-import { IConnectionContract } from "../azure/apim/contracts";
+import { IAuthorizationContract } from "../azure/apim/contracts";
 import { localize } from "../localize";
 import { nonNullProp } from "../utils/nonNull";
 import { treeUtils } from "../utils/treeUtils";
-import { ITokenProviderTreeRoot } from "./ITokenProviderTreeRoot";
+import { IAuthorizationProviderTreeRoot } from "./IAuthorizationProviderTreeRoot";
 
-export class ConnectionTreeItem extends AzureTreeItem<ITokenProviderTreeRoot> {
-    public static contextValue: string = 'azureApiManagementConnection';
-    public contextValue: string = ConnectionTreeItem.contextValue;
+export class AuthorizationTreeItem extends AzureTreeItem<IAuthorizationProviderTreeRoot> {
+    public static contextValue: string = 'azureApiManagementAuthorization';
+    public contextValue: string = AuthorizationTreeItem.contextValue;
     private _label: string;
 
     constructor(
         parent: AzureParentTreeItem,
-        public readonly connectionContract: IConnectionContract) {
+        public readonly authorizationContract: IAuthorizationContract) {
         super(parent);
-        this._label = nonNullProp(connectionContract, 'name');
+        this._label = nonNullProp(authorizationContract, 'name');
     }
 
     public get label() : string {
@@ -29,7 +29,7 @@ export class ConnectionTreeItem extends AzureTreeItem<ITokenProviderTreeRoot> {
     }
 
     public get description(): string | undefined {
-        return this.connectionContract.properties.Status;
+        return this.authorizationContract.properties.Status;
     }
 
     public get iconPath(): { light: string, dark: string } {
@@ -37,16 +37,16 @@ export class ConnectionTreeItem extends AzureTreeItem<ITokenProviderTreeRoot> {
     }
 
     public async deleteTreeItemImpl(): Promise<void> {
-        const message: string = localize("confirmConnectionRemove", `Are you sure you want to remove Connection '${this.connectionContract.name}' from TokenProvider '${this.root.tokenProviderName}'?`);
+        const message: string = localize("confirmAuthorizationAuthorizationRemove", `Are you sure you want to remove Authorization '${this.authorizationContract.name}' from AuthorizationProvider '${this.root.authorizationProviderName}'?`);
         const result = await window.showWarningMessage(message, { modal: true }, DialogResponses.deleteResponse, DialogResponses.cancel);
         if (result === DialogResponses.deleteResponse) {
-            const deletingMessage: string = localize("removingConnection", `Removing Connection "${this.connectionContract.name}" from TokenProvider '${this.root.tokenProviderName}.'`);
+            const deletingMessage: string = localize("removingAuthorization", `Removing Authorization "${this.authorizationContract.name}" from AuthorizationProvider '${this.root.authorizationProviderName}.'`);
             await window.withProgress({ location: ProgressLocation.Notification, title: deletingMessage }, async () => {
                 const apimService = new ApimService(this.root.credentials, this.root.environment.resourceManagerEndpointUrl, this.root.subscriptionId, this.root.resourceGroupName, this.root.serviceName);
-                await apimService.deleteConnection(this.root.tokenProviderName, nonNullProp(this.connectionContract, "name"));
+                await apimService.deleteAuthorization(this.root.authorizationProviderName, nonNullProp(this.authorizationContract, "name"));
             });
             // don't wait
-            window.showInformationMessage(localize("removedGatewayApi", `Successfully removed Connection "${this.connectionContract.name}" from TokenProvider '${this.root.tokenProviderName}'.`));
+            window.showInformationMessage(localize("removedGatewayApi", `Successfully removed Authorization "${this.authorizationContract.name}" from AuthorizationProvider '${this.root.authorizationProviderName}'.`));
 
         } else {
             throw new UserCancelledError();

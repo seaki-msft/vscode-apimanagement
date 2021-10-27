@@ -6,18 +6,18 @@
 import { ProgressLocation, window } from "vscode";
 import { IActionContext } from "vscode-azureextensionui";
 import { ServiceTreeItem } from "../explorer/ServiceTreeItem";
-import { ITokenProviderTreeItemContext, TokenProvidersTreeItem } from "../explorer/TokenProvidersTreeItem";
+import { IAuthorizationProviderTreeItemContext, AuthorizationProvidersTreeItem } from "../explorer/AuthorizationProvidersTreeItem";
 import { ext } from "../extensionVariables";
 import { localize } from "../localize";
 
-export async function createTokenProvider(context: IActionContext & Partial<ITokenProviderTreeItemContext>, node?: TokenProvidersTreeItem): Promise<void> {
+export async function createAuthorizationProvider(context: IActionContext & Partial<IAuthorizationProviderTreeItemContext>, node?: AuthorizationProvidersTreeItem): Promise<void> {
     if (!node) {
         const serviceNode = <ServiceTreeItem>await ext.tree.showTreeItemPicker(ServiceTreeItem.contextValue, context);
-        node = serviceNode.tokenProvidersTreeItem;
+        node = serviceNode.authorizationProvidersTreeItem;
     }
 
-    const tokenProviderName = await askInput('Enter TokenService name ...');
-    context.tokenProviderName = tokenProviderName;
+    const authorizationProviderName = await askInput('Enter Authorization Provider name ...');
+    context.authorizationProviderName = authorizationProviderName;
 
     const aad = 'aad';
 
@@ -57,7 +57,7 @@ export async function createTokenProvider(context: IActionContext & Partial<ITok
     window.withProgress(
         {
             location: ProgressLocation.Notification,
-            title: localize("creatingTokenProvider", `Creating TokenProvider '${tokenProviderName}' in API Management service ${node.root.serviceName} ...`),
+            title: localize("creatingAuthorizationProvider", `Creating AuthorizationProvider '${authorizationProviderName}' in API Management service ${node.root.serviceName} ...`),
             cancellable: false
         },
         // tslint:disable-next-line:no-non-null-assertion
@@ -65,7 +65,7 @@ export async function createTokenProvider(context: IActionContext & Partial<ITok
     ).then(async () => {
         // tslint:disable-next-line:no-non-null-assertion
         await node!.refresh(context);
-        window.showInformationMessage(localize("creatingTokenProvider", `Created TokenProvider '${tokenProviderName}' in API Management succesfully.`));
+        window.showInformationMessage(localize("creatingAuthorizationProvider", `Created AuthorizationProvider '${authorizationProviderName}' in API Management succesfully.`));
     });
 }
 

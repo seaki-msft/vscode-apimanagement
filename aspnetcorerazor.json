@@ -510,13 +510,13 @@
             "</xsl-transform>"
         ]
     },
-    "fetch-token": {
-        "prefix": "fetch-token",
-        "description": "Acquires access token for a token provider connection. Use in the inbound sections at API or Operation scopes.",
+    "get-authorization-context": {
+        "prefix": "get-authorization-context",
+        "description": "Acquires access token for a authorization using authorizationProvider. Use in the inbound sections at API or Operation scopes.",
         "body": [
-            "<fetch-token token-provider-id=\"$1\" connection-id=\"$2\" variable-name=\"access-token\" />",
+            "<get-authorization-context authorization-provider-id=\"$1\" authorization-id=\"$2\" variable-name=\"authContext\" />",
             "<set-header name=\"Authorization\" exists-action=\"override\">",
-            "\t<value>@(\"Bearer \" + ((Token)context.Variables[\"access-token\"]).Claims[\"AccessToken\"])</value>",
+            "\t<value>Bearer @((Authorization)@(((Authorization)context.Variables.GetValueOrDefault(\"authContext\"))?.AccessToken)</value>",
             "</set-header>"
         ]
     }

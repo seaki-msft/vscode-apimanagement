@@ -44,16 +44,16 @@ export interface ISubscriptionProperty {
 }
 
 
-export interface ITokenProviderContract {
+export interface IAuthorizationProviderContract {
     id: string;
     name: string;
     // tslint:disable-next-line: no-reserved-keywords
     type: string;
     location?: string;
-    properties: ITokenProviderPropertyContract;
+    properties: IAuthorizationProviderPropertyContract;
 }
 
-export interface ITokenProviderPropertyContract {
+export interface IAuthorizationProviderPropertyContract {
     displayName: string;
     identityProvider: string;
     OAuthSettings: {
@@ -65,16 +65,16 @@ export interface ITokenProviderPropertyContract {
     };
 }
 
-export interface IConnectionContract {
+export interface IAuthorizationContract {
     id: string;
     name: string;
     // tslint:disable-next-line: no-reserved-keywords
     type: string;
     location?: string;
-    properties: IConnectionPropertyContract;
+    properties: IAuthorizationPropertyContract;
 }
 
-export interface IConnectionPropertyContract {
+export interface IAuthorizationPropertyContract {
     Status: string; // TODO(seaki): switch to enum?
     Error: {
         Code: string;

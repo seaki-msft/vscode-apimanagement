@@ -6,7 +6,7 @@
 import { HttpOperationResponse, ServiceClient } from "@azure/ms-rest-js";
 import { TokenCredentialsBase } from "@azure/ms-rest-nodeauth";
 import { createGenericClient } from "vscode-azureextensionui";
-import { IConnectionContract, IGatewayApiContract, IGatewayContract, ILoginLinkRequestContract, ILoginLinkResponseContract, IMasterSubscription, ITokenProviderContract, ITokenProviderPropertyContract } from "./contracts";
+import { IAuthorizationContract as IAuthorizationContract, IGatewayApiContract, IGatewayContract, ILoginLinkRequestContract, ILoginLinkResponseContract, IMasterSubscription, IAuthorizationProviderContract, IAuthorizationProviderPropertyContract } from "./contracts";
 
 export class ApimService {
     public baseUrl: string;
@@ -16,7 +16,7 @@ export class ApimService {
     public resourceGroup: string;
     public serviceName: string;
     private readonly apiVersion: string = "2018-06-01-preview";
-    private readonly tokenServiceApiVersion: string = "2021-04-01-preview";
+    private readonly authorizationProviderApiVersion: string = "2021-04-01-preview";
 
     constructor(credentials: TokenCredentialsBase, endPointUrl: string, subscriptionId: string, resourceGroup: string, serviceName: string) {
         this.baseUrl = this.genSiteUrl(endPointUrl, subscriptionId, resourceGroup, serviceName);
@@ -96,31 +96,31 @@ export class ApimService {
         return `${endPointUrl}/subscriptions/${subscriptionId}/resourceGroups/${resourceGroup}/providers/Microsoft.ApiManagement/service/${serviceName}`;
     }
 
-    public async listTokenProviders(): Promise<ITokenProviderContract[]> {
+    public async listAuthorizationProviders(): Promise<IAuthorizationProviderContract[]> {
         const client: ServiceClient = await createGenericClient(this.credentials);
         const result: HttpOperationResponse = await client.sendRequest({
             method: "GET",
-            url: `${this.baseUrl}/authorizationProviders?api-version=${this.tokenServiceApiVersion}`
+            url: `${this.baseUrl}/authorizationProviders?api-version=${this.authorizationProviderApiVersion}`
         });
         // tslint:disable-next-line: no-unsafe-any
-        return <ITokenProviderContract[]>(result.parsedBody.value);
+        return <IAuthorizationProviderContract[]>(result.parsedBody.value);
     }
 
-    public async listConnections(tokenProviderName: string): Promise<IConnectionContract[]> {
+    public async listAuthorizations(authorizationProviderName: string): Promise<IAuthorizationContract[]> {
         const client: ServiceClient = await createGenericClient(this.credentials);
         const result: HttpOperationResponse = await client.sendRequest({
             method: "GET",
-            url: `${this.baseUrl}/authorizationProviders/${tokenProviderName}/authorizations?api-version=${this.tokenServiceApiVersion}`
+            url: `${this.baseUrl}/authorizationProviders/${authorizationProviderName}/authorizations?api-version=${this.authorizationProviderApiVersion}`
         });
         // tslint:disable-next-line: no-unsafe-any
-        return <IConnectionContract[]>(result.parsedBody.value);
+        return <IAuthorizationContract[]>(result.parsedBody.value);
     }
 
-    public async createTokenProvider(tokenProviderName:string, identityProvider: string, clientId: string, clientSecret: string, scopes: string = '', parameters : {[name: string]: string;} = {}): Promise<ITokenProviderContract> {
+    public async createAuthorizationProvider(authorizationProviderName:string, identityProvider: string, clientId: string, clientSecret: string, scopes: string = '', parameters : {[name: string]: string;} = {}): Promise<IAuthorizationProviderContract> {
         const client: ServiceClient = await createGenericClient(this.credentials);
 
-        const properties: ITokenProviderPropertyContract = {
-            displayName: tokenProviderName,
+        const properties: IAuthorizationProviderPropertyContract = {
+            displayName: authorizationProviderName,
             identityProvider: identityProvider,
             OAuthSettings : {
                 ClientId: clientId,
@@ -131,45 +131,45 @@ export class ApimService {
         }
         const result: HttpOperationResponse = await client.sendRequest({
             method: "PUT",
-            url: `${this.baseUrl}/authorizationProviders/${tokenProviderName}?api-version=${this.tokenServiceApiVersion}`,
+            url: `${this.baseUrl}/authorizationProviders/${authorizationProviderName}?api-version=${this.authorizationProviderApiVersion}`,
             body: { properties: properties }
         });
         // tslint:disable-next-line: no-unsafe-any
-        return <ITokenProviderContract>(result.parsedBody);
+        return <IAuthorizationProviderContract>(result.parsedBody);
     }
 
-    public async createConnection(tokenProviderName: string, connectionName: string): Promise<IConnectionContract> {
+    public async createAuthorization(authorizationProviderName: string, authorizationId: string): Promise<IAuthorizationContract> {
         const client: ServiceClient = await createGenericClient(this.credentials);
         const result: HttpOperationResponse = await client.sendRequest({
             method: "PUT",
-            url: `${this.baseUrl}/authorizationProviders/${tokenProviderName}/authorizations/${connectionName}?api-version=${this.tokenServiceApiVersion}`,
+            url: `${this.baseUrl}/authorizationProviders/${authorizationProviderName}/authorizations/${authorizationId}?api-version=${this.authorizationProviderApiVersion}`,
             body: {}
         });
         // tslint:disable-next-line: no-unsafe-any
-        return <IConnectionContract>(result.parsedBody);
+        return <IAuthorizationContract>(result.parsedBody);
     }
 
-    public async deleteConnection(tokenProviderName: string, connectionName: string): Promise<void> {
+    public async deleteAuthorization(authorizationProviderName: string, authorizationId: string): Promise<void> {
         const client: ServiceClient = await createGenericClient(this.credentials);
         await client.sendRequest({
             method: "DELETE",
-            url: `${this.baseUrl}/authorizationProviders/${tokenProviderName}/authorizations/${connectionName}?api-version=${this.tokenServiceApiVersion}`
+            url: `${this.baseUrl}/authorizationProviders/${authorizationProviderName}/authorizations/${authorizationId}?api-version=${this.authorizationProviderApiVersion}`
         });
     }
 
-    public async deleteTokenProvider(tokenProviderName: string): Promise<void> {
+    public async deleteAuthorizationProvider(authorizationProviderName: string): Promise<void> {
         const client: ServiceClient = await createGenericClient(this.credentials);
         await client.sendRequest({
             method: "DELETE",
-            url: `${this.baseUrl}/authorizationProviders/${tokenProviderName}?api-version=${this.tokenServiceApiVersion}`
+            url: `${this.baseUrl}/authorizationProviders/${authorizationProviderName}?api-version=${this.authorizationProviderApiVersion}`
         });
     }
 
-    public async getLoginLink(tokenProviderName: string, connectionName: string, body: ILoginLinkRequestContract) : Promise<ILoginLinkResponseContract> {
+    public async getLoginLink(authorizationProviderName: string, authorizationId: string, body: ILoginLinkRequestContract) : Promise<ILoginLinkResponseContract> {
         const client: ServiceClient = await createGenericClient(this.credentials);
         const result: HttpOperationResponse = await client.sendRequest({
             method: "POST",
-            url: `${this.baseUrl}/authorizationProviders/${tokenProviderName}/authorizations/${connectionName}/getLoginLinks?api-version=${this.tokenServiceApiVersion}`,
+            url: `${this.baseUrl}/authorizationProviders/${authorizationProviderName}/authorizations/${authorizationId}/getLoginLinks?api-version=${this.authorizationProviderApiVersion}`,
             body: body
         });
         // tslint:disable-next-line: no-unsafe-any

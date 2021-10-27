@@ -5,24 +5,24 @@
 
 import { ProgressLocation, window } from "vscode";
 import { IActionContext } from "vscode-azureextensionui";
-import { ConnectionsTreeItem, IConnectionTreeItemContext } from "../explorer/ConnectionsTreeItem";
-import { TokenProviderTreeItem } from "../explorer/TokenProviderTreeItem";
+import { AuthorizationsTreeItem, IAuthorizationTreeItemContext } from "../explorer/AuthorizationsTreeItem";
+import { AuthorizationProviderTreeItem } from "../explorer/AuthorizationProviderTreeItem";
 import { ext } from "../extensionVariables";
 import { localize } from "../localize";
 
-export async function createConnection(context: IActionContext & Partial<IConnectionTreeItemContext>, node?: ConnectionsTreeItem): Promise<void> {
+export async function createAuthorization(context: IActionContext & Partial<IAuthorizationTreeItemContext>, node?: AuthorizationsTreeItem): Promise<void> {
     if (!node) {
-        const tokenProviderNode = <TokenProviderTreeItem>await ext.tree.showTreeItemPicker(TokenProviderTreeItem.contextValue, context);
-        node = tokenProviderNode.connectionsTreeItem;
+        const authorizationProviderNode = <AuthorizationProviderTreeItem>await ext.tree.showTreeItemPicker(AuthorizationProviderTreeItem.contextValue, context);
+        node = authorizationProviderNode.authorizationsTreeItem;
     }
     
-    const connectionName = await askInput('Enter Connection name ...');
-    context.connectionName = connectionName;
+    const authorizationName = await askInput('Enter Authorization name ...');
+    context.authorizationName = authorizationName;
 
     window.withProgress(
         {
             location: ProgressLocation.Notification,
-            title: localize("creatingConnection", `Creating Connection '${connectionName}' for Token Service ${node.root.tokenProviderName} ...`),
+            title: localize("creatingAuthorization", `Creating Authorization '${authorizationName}' for Authorization Provider ${node.root.authorizationProviderName} ...`),
             cancellable: false
         },
         // tslint:disable-next-line:no-non-null-assertion
@@ -32,7 +32,7 @@ export async function createConnection(context: IActionContext & Partial<IConnec
     ).then(async () => {
         // tslint:disable-next-line:no-non-null-assertion
         await node!.refresh(context);
-        window.showInformationMessage(localize("createdConnection", `Created Connection '${connectionName}' in API Management succesfully.`));
+        window.showInformationMessage(localize("createdAuthorization", `Created Authorization '${authorizationName}' in API Management succesfully.`));
     });
 }
 

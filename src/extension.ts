@@ -11,12 +11,12 @@ import { AzExtTreeDataProvider, AzureParentTreeItem, AzureTreeItem, AzureUserInp
 import { addApiFilter } from './commands/addApiFilter';
 import { addApiToGateway } from './commands/addApiToGateway';
 import { addApiToProduct } from './commands/addApiToProduct';
-import { authorizeConnection } from './commands/authorizeConnection';
-import { copyConnectionPolicy } from './commands/copyConnectionPolicy';
+import { authorizeAuthorization } from './commands/authorizeAuthorization';
+import { copyAuthorizationPolicy } from './commands/copyAuthorizationPolicy';
 import { copySubscriptionKey } from './commands/copySubscriptionKey';
-import { createConnection } from './commands/createConnection';
+import { createAuthorization } from './commands/createAuthorization';
 import { createService } from './commands/createService';
-import { createTokenProvider } from './commands/createTokenProvider';
+import { createAuthorizationProvider } from './commands/createAuthorizationProvider'
 import { debugPolicy } from './commands/debugPolicies/debugPolicy';
 import { deleteNode } from './commands/deleteNode';
 import { copyDockerRunCommand, generateKubernetesDeployment } from './commands/deployGateway';
@@ -43,8 +43,8 @@ import { ApiPolicyTreeItem } from './explorer/ApiPolicyTreeItem';
 import { ApisTreeItem } from './explorer/ApisTreeItem';
 import { ApiTreeItem } from './explorer/ApiTreeItem';
 import { AzureAccountTreeItem } from './explorer/AzureAccountTreeItem';
-import { ConnectionsTreeItem } from './explorer/ConnectionsTreeItem';
-import { ConnectionTreeItem } from './explorer/ConnectionTreeItem';
+import { AuthorizationsTreeItem } from './explorer/AuthorizationsTreeItem';
+import { AuthorizationTreeItem } from './explorer/AuthorizationTreeItem';
 import { ApiResourceEditor } from './explorer/editors/arm/ApiResourceEditor';
 import { OperationResourceEditor } from './explorer/editors/arm/OperationResourceEditor';
 import { ProductResourceEditor } from './explorer/editors/arm/ProductResourceEditor';
@@ -66,8 +66,8 @@ import { ProductTreeItem } from './explorer/ProductTreeItem';
 import { ServicePolicyTreeItem } from './explorer/ServicePolicyTreeItem';
 import { ServiceTreeItem } from './explorer/ServiceTreeItem';
 import { SubscriptionTreeItem } from './explorer/SubscriptionTreeItem';
-import { TokenProvidersTreeItem } from './explorer/TokenProvidersTreeItem';
-import { TokenProviderTreeItem } from './explorer/TokenProviderTreeItem';
+import { AuthorizationProvidersTreeItem } from './explorer/AuthorizationProvidersTreeItem';
+import { AuthorizationProviderTreeItem } from './explorer/AuthorizationProviderTreeItem';
 import { ext } from './extensionVariables';
 import { localize } from './localize';
 
@@ -149,12 +149,12 @@ function registerCommands(tree: AzExtTreeDataProvider): void {
     registerCommand('azureApiManagement.createSubscription', createSubscription);
     registerCommand('azureApiManagement.deleteSubscription', async (context: IActionContext, node?: AzureTreeItem) => await deleteNode(context, SubscriptionTreeItem.contextValue, node));
 
-    registerCommand('azureApiManagement.deleteTokenProvider', async (context: IActionContext, node?: AzureTreeItem) => await deleteNode(context, TokenProviderTreeItem.contextValue, node));
-    registerCommand('azureApiManagement.deleteConnection', async (context: IActionContext, node?: AzureTreeItem) => await deleteNode(context, ConnectionTreeItem.contextValue, node));
-    registerCommand('azureApiManagement.createTokenProvider', async (context: IActionContext, node?: TokenProvidersTreeItem) => { await createTokenProvider(context, node); });
-    registerCommand('azureApiManagement.createConnection', async (context: IActionContext, node?: ConnectionsTreeItem) => { await createConnection(context, node); });
-    registerCommand('azureApiManagement.authorizeConnection', async (context: IActionContext, node?: ConnectionTreeItem) => { await authorizeConnection(context, node); });
-    registerCommand('azureApiManagement.copyConnectionPolicy', async (context: IActionContext, node?: ConnectionTreeItem) => { await copyConnectionPolicy(context, node); });
+    registerCommand('azureApiManagement.deleteAuthorizationProvider', async (context: IActionContext, node?: AzureTreeItem) => await deleteNode(context, AuthorizationProviderTreeItem.contextValue, node));
+    registerCommand('azureApiManagement.deleteAuthorization', async (context: IActionContext, node?: AzureTreeItem) => await deleteNode(context, AuthorizationTreeItem.contextValue, node));
+    registerCommand('azureApiManagement.createAuthorizationProvider', async (context: IActionContext, node?: AuthorizationProvidersTreeItem) => { await createAuthorizationProvider(context, node); });
+    registerCommand('azureApiManagement.createAuthorization', async (context: IActionContext, node?: AuthorizationsTreeItem) => { await createAuthorization(context, node); });
+    registerCommand('azureApiManagement.authorizeAuthorization', async (context: IActionContext, node?: AuthorizationTreeItem) => { await authorizeAuthorization(context, node); });
+    registerCommand('azureApiManagement.copyAuthorizationPolicy', async (context: IActionContext, node?: AuthorizationTreeItem) => { await copyAuthorizationPolicy(context, node); });
 }
 
 // tslint:disable-next-line: max-func-body-length
@@ -280,6 +280,6 @@ export function deactivateInternal() {}
 class UriEventHandler extends vscode.EventEmitter<vscode.Uri> implements vscode.UriHandler {
     public handleUri() {
         ext.outputChannel.appendLine(localize('oauthFlowComplete', "OAuth flow completed."));
-        vscode.window.showInformationMessage(localize('authSuccess', 'Authorization complete. You can now close the browser window that was launched during the connection login process.'));
+        vscode.window.showInformationMessage(localize('authSuccess', 'Authorization complete. You can now close the browser window that was launched during the authorization process.'));
     }
 }

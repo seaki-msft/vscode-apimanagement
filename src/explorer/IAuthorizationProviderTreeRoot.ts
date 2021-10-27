@@ -5,6 +5,6 @@
 
 import { IServiceTreeRoot } from "./IServiceTreeRoot";
 
-export interface ITokenProviderTreeRoot extends IServiceTreeRoot {
-    tokenProviderName: string;
+export interface IAuthorizationProviderTreeRoot extends IServiceTreeRoot {
+    authorizationProviderName: string;
 }
