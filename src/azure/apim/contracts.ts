@@ -43,7 +43,6 @@ export interface ISubscriptionProperty {
     secondaryKey: string;
 }
 
-
 export interface IAuthorizationProviderContract {
     id: string;
     name: string;
