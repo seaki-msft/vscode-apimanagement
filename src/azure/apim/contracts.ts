@@ -82,6 +82,20 @@ export interface IAuthorizationPropertyContract {
     };
 }
 
+export interface IAuthorizationPermissionContract {
+    id: string;
+    name: string;
+    // tslint:disable-next-line: no-reserved-keywords
+    type: string;
+    location?: string;
+    properties: IAuthorizationPermissionPropertyContract;
+}
+
+export interface IAuthorizationPermissionPropertyContract {
+    ObjectId: string;
+    TenantId: string;
+}
+
 export interface ILoginLinkRequestContract {
     postLoginRedirectUrl: string;
 }

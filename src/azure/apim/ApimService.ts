@@ -6,7 +6,9 @@
 import { HttpOperationResponse, ServiceClient } from "@azure/ms-rest-js";
 import { TokenCredentialsBase } from "@azure/ms-rest-nodeauth";
 import { createGenericClient } from "vscode-azureextensionui";
-import { IAuthorizationContract as IAuthorizationContract, IGatewayApiContract, IGatewayContract, ILoginLinkRequestContract, ILoginLinkResponseContract, IMasterSubscription, IAuthorizationProviderContract, IAuthorizationProviderPropertyContract } from "./contracts";
+import { 
+    IAuthorizationContract, IGatewayApiContract, IGatewayContract, ILoginLinkRequestContract, ILoginLinkResponseContract, IMasterSubscription, 
+    IAuthorizationProviderContract, IAuthorizationProviderPropertyContract, IAuthorizationPermissionContract, IAuthorizationPermissionPropertyContract } from "./contracts";
 
 export class ApimService {
     public baseUrl: string;
@@ -106,16 +108,6 @@ export class ApimService {
         return <IAuthorizationProviderContract[]>(result.parsedBody.value);
     }
 
-    public async listAuthorizations(authorizationProviderName: string): Promise<IAuthorizationContract[]> {
-        const client: ServiceClient = await createGenericClient(this.credentials);
-        const result: HttpOperationResponse = await client.sendRequest({
-            method: "GET",
-            url: `${this.baseUrl}/authorizationProviders/${authorizationProviderName}/authorizations?api-version=${this.authorizationProviderApiVersion}`
-        });
-        // tslint:disable-next-line: no-unsafe-any
-        return <IAuthorizationContract[]>(result.parsedBody.value);
-    }
-
     public async createAuthorizationProvider(authorizationProviderName:string, identityProvider: string, clientId: string, clientSecret: string, scopes: string = '', parameters : {[name: string]: string;} = {}): Promise<IAuthorizationProviderContract> {
         const client: ServiceClient = await createGenericClient(this.credentials);
 
@@ -138,6 +130,24 @@ export class ApimService {
         return <IAuthorizationProviderContract>(result.parsedBody);
     }
 
+    public async deleteAuthorizationProvider(authorizationProviderName: string): Promise<void> {
+        const client: ServiceClient = await createGenericClient(this.credentials);
+        await client.sendRequest({
+            method: "DELETE",
+            url: `${this.baseUrl}/authorizationProviders/${authorizationProviderName}?api-version=${this.authorizationProviderApiVersion}`
+        });
+    }
+    
+    public async listAuthorizations(authorizationProviderName: string): Promise<IAuthorizationContract[]> {
+        const client: ServiceClient = await createGenericClient(this.credentials);
+        const result: HttpOperationResponse = await client.sendRequest({
+            method: "GET",
+            url: `${this.baseUrl}/authorizationProviders/${authorizationProviderName}/authorizations?api-version=${this.authorizationProviderApiVersion}`
+        });
+        // tslint:disable-next-line: no-unsafe-any
+        return <IAuthorizationContract[]>(result.parsedBody.value);
+    }
+
     public async createAuthorization(authorizationProviderName: string, authorizationId: string): Promise<IAuthorizationContract> {
         const client: ServiceClient = await createGenericClient(this.credentials);
         const result: HttpOperationResponse = await client.sendRequest({
@@ -157,14 +167,6 @@ export class ApimService {
         });
     }
 
-    public async deleteAuthorizationProvider(authorizationProviderName: string): Promise<void> {
-        const client: ServiceClient = await createGenericClient(this.credentials);
-        await client.sendRequest({
-            method: "DELETE",
-            url: `${this.baseUrl}/authorizationProviders/${authorizationProviderName}?api-version=${this.authorizationProviderApiVersion}`
-        });
-    }
-
     public async getLoginLink(authorizationProviderName: string, authorizationId: string, body: ILoginLinkRequestContract) : Promise<ILoginLinkResponseContract> {
         const client: ServiceClient = await createGenericClient(this.credentials);
         const result: HttpOperationResponse = await client.sendRequest({
@@ -174,5 +176,38 @@ export class ApimService {
         });
         // tslint:disable-next-line: no-unsafe-any
         return <ILoginLinkResponseContract>(result.parsedBody);
+    }
+    
+    public async listAuthorizationPermissions(authorizationProviderName: string, authorizationName): Promise<IAuthorizationPermissionContract[]> {
+        const client: ServiceClient = await createGenericClient(this.credentials);
+        const result: HttpOperationResponse = await client.sendRequest({
+            method: "GET",
+            url: `${this.baseUrl}/authorizationProviders/${authorizationProviderName}/authorizations/${authorizationName}/permissions?api-version=${this.authorizationProviderApiVersion}`
+        });
+        // tslint:disable-next-line: no-unsafe-any
+        return <IAuthorizationPermissionContract[]>(result.parsedBody.value);
+    }
+
+    public async createAuthorizationPermission(authorizationProviderName: string, authorizationId: string, permissionName: string, objectId: string, tenantId: string): Promise<IAuthorizationPermissionContract> {
+        const client: ServiceClient = await createGenericClient(this.credentials);
+        const properties: IAuthorizationPermissionPropertyContract = {
+            ObjectId: objectId,
+            TenantId: tenantId
+        }
+        const result: HttpOperationResponse = await client.sendRequest({
+            method: "PUT",
+            url: `${this.baseUrl}/authorizationProviders/${authorizationProviderName}/authorizations/${authorizationId}/permissions/${permissionName}?api-version=${this.authorizationProviderApiVersion}`,
+            body: { properties: properties }
+        });
+        // tslint:disable-next-line: no-unsafe-any
+        return <IAuthorizationPermissionContract>(result.parsedBody);
+    }
+
+    public async deleteAuthorizationPermission(authorizationProviderName: string, authorizationId: string, permissionName: string): Promise<void> {
+        const client: ServiceClient = await createGenericClient(this.credentials);
+        await client.sendRequest({
+            method: "DELETE",
+            url: `${this.baseUrl}/authorizationProviders/${authorizationProviderName}/authorizations/${authorizationId}/permissions/${permissionName}?api-version=${this.authorizationProviderApiVersion}`
+        });
     }
 }

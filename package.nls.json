@@ -52,5 +52,7 @@
     "azureApiManagement.createAuthorization": "Create Authorization",
     "azureApiManagement.deleteAuthorization": "Delete Authorization",
     "azureApiManagement.authorizeAuthorization": "Authorize",
-    "azureApiManagement.copyAuthorizationPolicy": "Copy Policy Snippet"
+    "azureApiManagement.copyAuthorizationPolicy": "Copy Policy Snippet",
+    "azureApiManagement.createAuthorizationPermission": "Create Permission",
+    "azureApiManagement.deleteAuthorizationPermission": "Delete Permission"
 }
