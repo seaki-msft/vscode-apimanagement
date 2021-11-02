@@ -43,7 +43,6 @@ export interface ISubscriptionProperty {
     secondaryKey: string;
 }
 
-
 export interface IAuthorizationProviderContract {
     id: string;
     name: string;
@@ -80,6 +79,20 @@ export interface IAuthorizationPropertyContract {
         Code: string;
         Message: string;
     };
+}
+
+export interface IAuthorizationPermissionContract {
+    id: string;
+    name: string;
+    // tslint:disable-next-line: no-reserved-keywords
+    type: string;
+    location?: string;
+    properties: IAuthorizationPermissionPropertyContract;
+}
+
+export interface IAuthorizationPermissionPropertyContract {
+    objectId: string;
+    tenantId: string;
 }
 
 export interface ILoginLinkRequestContract {
