@@ -8,7 +8,8 @@ import { TokenCredentialsBase } from "@azure/ms-rest-nodeauth";
 import { createGenericClient } from "vscode-azureextensionui";
 import { 
     IAuthorizationContract, IGatewayApiContract, IGatewayContract, ILoginLinkRequestContract, ILoginLinkResponseContract, IMasterSubscription, 
-    IAuthorizationProviderContract, IAuthorizationProviderPropertyContract, IAuthorizationPermissionContract, IAuthorizationPermissionPropertyContract } from "./contracts";
+    IAuthorizationProviderContract, IAuthorizationProviderPropertyContract, IAuthorizationPermissionContract, IAuthorizationPermissionPropertyContract,
+    IServiceProviderContract } from "./contracts";
 
 export class ApimService {
     public baseUrl: string;
@@ -98,6 +99,16 @@ export class ApimService {
         return `${endPointUrl}/subscriptions/${subscriptionId}/resourceGroups/${resourceGroup}/providers/Microsoft.ApiManagement/service/${serviceName}`;
     }
 
+    public async listServiceProviders(): Promise<IServiceProviderContract[]> {
+        const client: ServiceClient = await createGenericClient(this.credentials);
+        const result: HttpOperationResponse = await client.sendRequest({
+            method: "GET",
+            url: `${this.baseUrl}/serviceProviders?api-version=${this.authorizationProviderApiVersion}`
+        });
+        // tslint:disable-next-line: no-unsafe-any
+        return <IServiceProviderContract[]>(result.parsedBody.value);
+    }
+
     public async listAuthorizationProviders(): Promise<IAuthorizationProviderContract[]> {
         const client: ServiceClient = await createGenericClient(this.credentials);
         const result: HttpOperationResponse = await client.sendRequest({
@@ -108,8 +119,13 @@ export class ApimService {
         return <IAuthorizationProviderContract[]>(result.parsedBody.value);
     }
 
-    public async createAuthorizationProvider(authorizationProviderName:string, identityProvider: string, clientId: string, clientSecret: string, scopes: string = '', parameters : {[name: string]: string;} = {}): Promise<IAuthorizationProviderContract> {
+    public async createAuthorizationProvider(authorizationProviderName:string, identityProvider: string, parameters : {[name: string]: string;} = {}): Promise<IAuthorizationProviderContract> {
         const client: ServiceClient = await createGenericClient(this.credentials);
+
+        // TODO(seaki): lowercase
+        const clientId = parameters.ClientId;
+        const clientSecret = parameters.ClientSecret;
+        const scopes = parameters.scopes;
 
         const properties: IAuthorizationProviderPropertyContract = {
             displayName: authorizationProviderName,

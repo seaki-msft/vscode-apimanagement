@@ -43,6 +43,24 @@ export interface ISubscriptionProperty {
     secondaryKey: string;
 }
 
+export interface IServiceProvidersContract {
+    values: IServiceProviderContract[];
+}
+
+export interface IServiceProviderContract {
+    Id: string;
+    DisplayName: string;
+    AuthenticationType: string;
+    Parameters: IServiceProviderParameterContract[];
+}
+
+export interface IServiceProviderParameterContract {
+    Name: string;
+    DisplayName: string;
+    Description: string;
+    Default: string;
+}
+
 export interface IAuthorizationProviderContract {
     id: string;
     name: string;

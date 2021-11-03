@@ -7,8 +7,10 @@ import { ProgressLocation, window } from "vscode";
 import { IActionContext } from "vscode-azureextensionui";
 import { ServiceTreeItem } from "../explorer/ServiceTreeItem";
 import { IAuthorizationProviderTreeItemContext, AuthorizationProvidersTreeItem } from "../explorer/AuthorizationProvidersTreeItem";
+import { IServiceProviderParameterContract } from "../azure/apim/contracts";
 import { ext } from "../extensionVariables";
 import { localize } from "../localize";
+import { ApimService } from "../azure/apim/ApimService"
 
 export async function createAuthorizationProvider(context: IActionContext & Partial<IAuthorizationProviderTreeItemContext>, node?: AuthorizationProvidersTreeItem): Promise<void> {
     if (!node) {
@@ -19,37 +21,22 @@ export async function createAuthorizationProvider(context: IActionContext & Part
     const authorizationProviderName = await askInput('Enter Authorization Provider name ...');
     context.authorizationProviderName = authorizationProviderName;
 
-    const aad = 'aad';
+    const apimService = new ApimService(node.root.credentials, node.root.environment.resourceManagerEndpointUrl, node.root.subscriptionId, node.root.resourceGroupName, node.root.serviceName);
+    // TODO(seaki): add caching
+    const options = await apimService.listServiceProviders();
+    const choice = await ext.ui.showQuickPick(options.map((s) => { return { label: s.Id, description: '', detail: '' }; }), { placeHolder: 'Select Identity Provider ...', canPickMany: false });
 
-    // TODO(seaki): dynamically fetch this list & its parameter
-    const options = [ aad, 'salesforce', 'bitly', 'box', 'facebook,', 'fitbit', 'dropbox', 
-    'spotify', 'github', 'google', 'facebook', 'instagram', 'stripe', 'flickr',
-    'intuit', 'linkedin', 'mailchimp', 'yammer', 'pinterest',
-    'microsoftbot', 'visualstudioonline'];
-
-    const identityProvider = await ext.ui.showQuickPick(options.map((s) => { return { label: s, description: '', detail: '' }; }), { placeHolder: 'Select Identity Provider ...', canPickMany: false });
-
-    context.identityProvider = identityProvider.label;
-
-    const clientId = await askInput('Enter Client Id ...');
-    context.clientId = clientId;
-
-    const clientSecret = await askInput('Enter Client Secret ...');
-    context.clientSecret = clientSecret;
-
-    const scopes = await askInput('Enter Scopes ...');
-    context.scopes = scopes;
-
+    const selectedIdentityProvider = options.find(s => s.Id == choice.label)!;
+    context.identityProvider = choice.label;
 
     const parameters: IParameterValues = {};
+    for (var param of selectedIdentityProvider?.Parameters) {
+        parameters[param.Name] = await askIdentityProviderParameterInput(param);
+    }
 
-    if (context.identityProvider === aad) {
-
-        const tenantId = await askInput('Enter Tenant Id ...');
-        parameters['tenantId'] = tenantId;
-
-        const resourceUri = await askInput('Enter Resource Uri ...');
-        parameters['resourceUri'] = resourceUri;
+    // Some IDPs don't have scopes. Ask explicitly if so
+    if (selectedIdentityProvider?.Parameters.findIndex(p => p.Name == "scopes") == -1) {
+        parameters["scopes"] = await askInput("Enter scopes...");
     }
 
     context.parameters = parameters;
@@ -67,6 +54,27 @@ export async function createAuthorizationProvider(context: IActionContext & Part
         await node!.refresh(context);
         window.showInformationMessage(localize("creatingAuthorizationProvider", `Created AuthorizationProvider '${authorizationProviderName}' in API Management succesfully.`));
     });
+}
+
+async function askIdentityProviderParameterInput(param: IServiceProviderParameterContract) : Promise<string> {
+    var promptString = `Enter ${param.DisplayName}... `;
+    var additional = "("
+    if (!!param.Description) {
+        additional += `${param.Description}. `; 
+    } 
+    if (!!param.Default) {
+        additional += `Default is ${param.Default}`;
+    }
+    additional += ")";
+    if (additional.length > 2) {
+        promptString += additional;
+    }
+
+    var value = await askInput(promptString);
+    if (!value) {
+        value = param.Default;
+    }
+    return value;
 }
 
 async function askInput(message: string) : Promise<string> {
