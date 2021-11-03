@@ -32,7 +32,7 @@ export async function createAuthorization(context: IActionContext & Partial<IAut
     ).then(async () => {
         // tslint:disable-next-line:no-non-null-assertion
         await node!.refresh(context);
-        window.showInformationMessage(localize("createdAuthorization", `Created Authorization '${authorizationName}' in API Management succesfully.`));
+        window.showInformationMessage(localize("createdAuthorization", `Created Authorization '${authorizationName}' in API Management successfully.`));
     });
 }
 

@@ -19,11 +19,9 @@ export async function createAuthorizationPermission(context: IActionContext & Pa
     const permissionName = await askInput('Enter Permission name ...');
     context.permissionName = permissionName;
 
-    const objectId = await askInput('Enter Object Id ...');
+    const objectId = await askInput(`Enter Object Id (Tenant Id=${node.root.tenantId})...`);
     context.objectId = objectId;
-
-    const tenantId = await askInput('Enter Tenant Id ...');
-    context.tenantId = tenantId; // TODO(seaki): use "node.root.tenantId"?
+    context.tenantId = node.root.tenantId;
 
     window.withProgress(
         {
@@ -38,7 +36,7 @@ export async function createAuthorizationPermission(context: IActionContext & Pa
     ).then(async () => {
         // tslint:disable-next-line:no-non-null-assertion
         await node!.refresh(context);
-        window.showInformationMessage(localize("createdAuthorizationPermission", `Created permission '${permissionName}' succesfully.`));
+        window.showInformationMessage(localize("createdAuthorizationPermission", `Created permission '${permissionName}' successfully.`));
     });
 }
 

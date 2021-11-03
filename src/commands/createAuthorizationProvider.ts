@@ -52,7 +52,7 @@ export async function createAuthorizationProvider(context: IActionContext & Part
     ).then(async () => {
         // tslint:disable-next-line:no-non-null-assertion
         await node!.refresh(context);
-        window.showInformationMessage(localize("creatingAuthorizationProvider", `Created AuthorizationProvider '${authorizationProviderName}' in API Management succesfully.`));
+        window.showInformationMessage(localize("creatingAuthorizationProvider", `Created AuthorizationProvider '${authorizationProviderName}' in API Management successfully.`));
     });
 }
 
