@@ -20,7 +20,7 @@ export async function copyAuthorizationPolicy(context: IActionContext, node?: Au
 
     vscode.env.clipboard.writeText(`<get-authorization-context provider-id="${pid}" authorization-id="${aid}" context-variable-name="${pid}-${aid}-context" identity-type="managed" ignore-error="true" />
 <set-header name="Authorization" exists-action="override">
-    <value>Bearer @((Authorization)@(((Authorization)context.Variables.GetValueOrDefault("${pid}-${aid}-context"))?.AccessToken)</value>
+    <value>@("Bearer " + ((Authorization)context.Variables.GetValueOrDefault("${pid}-${aid}-context"))?.AccessToken)</value>
 </set-header>`);
     vscode.window.showInformationMessage(localize("CopySnippet", `Policy copied to clipboard.`));
 }

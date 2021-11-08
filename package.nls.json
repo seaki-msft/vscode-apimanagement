@@ -48,6 +48,7 @@
     "azureApiManagement.createSubscription": "Create a new Subscription",
     "azureApiManagement.deleteSubscription": "Delete Subscription",
     "azureApiManagement.createAuthorizationProvider": "Create Authorization Provider",
+    "azureApiManagement.editAuthorizationProvider": "Edit Authorization Provider",
     "azureApiManagement.deleteAuthorizationProvider": "Delete Authorization Provider",
     "azureApiManagement.createAuthorization": "Create Authorization",
     "azureApiManagement.deleteAuthorization": "Delete Authorization",

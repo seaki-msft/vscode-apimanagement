@@ -17,7 +17,7 @@ import { copySubscriptionKey } from './commands/copySubscriptionKey';
 import { createAuthorization } from './commands/createAuthorization';
 import { createService } from './commands/createService';
 import { createAuthorizationPermission } from './commands/createAuthorizationPermission'
-import { createAuthorizationProvider } from './commands/createAuthorizationProvider'
+import { createAuthorizationProvider, editAuthorizationProvider } from './commands/createAuthorizationProvider'
 import { debugPolicy } from './commands/debugPolicies/debugPolicy';
 import { deleteNode } from './commands/deleteNode';
 import { copyDockerRunCommand, generateKubernetesDeployment } from './commands/deployGateway';
@@ -153,6 +153,7 @@ function registerCommands(tree: AzExtTreeDataProvider): void {
     registerCommand('azureApiManagement.deleteSubscription', async (context: IActionContext, node?: AzureTreeItem) => await deleteNode(context, SubscriptionTreeItem.contextValue, node));
 
     registerCommand('azureApiManagement.createAuthorizationProvider', async (context: IActionContext, node?: AuthorizationProvidersTreeItem) => { await createAuthorizationProvider(context, node); });
+    registerCommand('azureApiManagement.editAuthorizationProvider', async (context: IActionContext, node?: AuthorizationProviderTreeItem) => { await editAuthorizationProvider(context, node); });
     registerCommand('azureApiManagement.deleteAuthorizationProvider', async (context: IActionContext, node?: AzureTreeItem) => await deleteNode(context, AuthorizationProviderTreeItem.contextValue, node));
     registerCommand('azureApiManagement.deleteAuthorization', async (context: IActionContext, node?: AzureTreeItem) => await deleteNode(context, AuthorizationTreeItem.contextValue, node));
     registerCommand('azureApiManagement.createAuthorization', async (context: IActionContext, node?: AuthorizationsTreeItem) => { await createAuthorization(context, node); });

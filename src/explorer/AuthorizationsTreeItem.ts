@@ -59,7 +59,7 @@ export class AuthorizationsTreeItem extends AzureParentTreeItem<IAuthorizationPr
 
             try {
                 const apimService = new ApimService(this.root.credentials, this.root.environment.resourceManagerEndpointUrl, this.root.subscriptionId, this.root.resourceGroupName, this.root.serviceName);
-                const authorization = await apimService.createAuthorization(this.root.authorizationProviderName, authorizationName);
+                const authorization = await apimService.putAuthorization(this.root.authorizationProviderName, authorizationName);
                 return new AuthorizationTreeItem(this, authorization);
 
             } catch (error) {

@@ -72,7 +72,7 @@ export interface IAuthorizationProviderContract {
 
 export interface IAuthorizationProviderPropertyContract {
     displayName: string;
-    identityProvider: string;
+    IdentityProvider: string;
     OAuthSettings: {
         ClientId: string;
         ClientSecret: string;

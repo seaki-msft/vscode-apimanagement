@@ -4,7 +4,9 @@
  *--------------------------------------------------------------------------------------------*/
 
 import { IServiceTreeRoot } from "./IServiceTreeRoot";
+import { IAuthorizationProviderPropertyContract } from "../azure/apim/contracts";
 
 export interface IAuthorizationProviderTreeRoot extends IServiceTreeRoot {
     authorizationProviderName: string;
+    authorizationProperties: IAuthorizationProviderPropertyContract;
 }

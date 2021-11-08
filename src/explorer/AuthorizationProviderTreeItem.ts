@@ -72,7 +72,8 @@ export class AuthorizationProviderTreeItem extends AzureParentTreeItem<IAuthoriz
 
     private createRoot(subRoot: ISubscriptionContext): IAuthorizationProviderTreeRoot {
         return Object.assign({}, <IServiceTreeRoot>subRoot, {
-            authorizationProviderName: nonNullProp(this.authorizationProviderContract, 'name')
+            authorizationProviderName: nonNullProp(this.authorizationProviderContract, 'name'),
+            authorizationProperties: nonNullProp(this.authorizationProviderContract, 'properties'),
         });
     }
 }

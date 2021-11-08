@@ -119,7 +119,7 @@ export class ApimService {
         return <IAuthorizationProviderContract[]>(result.parsedBody.value);
     }
 
-    public async createAuthorizationProvider(authorizationProviderName:string, identityProvider: string, parameters : {[name: string]: string;} = {}): Promise<IAuthorizationProviderContract> {
+    public async putAuthorizationProvider(authorizationProviderName:string, identityProvider: string, parameters : {[name: string]: string;} = {}): Promise<IAuthorizationProviderContract> {
         const client: ServiceClient = await createGenericClient(this.credentials);
 
         // TODO(seaki): lowercase
@@ -129,7 +129,7 @@ export class ApimService {
 
         const properties: IAuthorizationProviderPropertyContract = {
             displayName: authorizationProviderName,
-            identityProvider: identityProvider,
+            IdentityProvider: identityProvider,
             OAuthSettings : {
                 ClientId: clientId,
                 ClientSecret: clientSecret,
@@ -164,7 +164,7 @@ export class ApimService {
         return <IAuthorizationContract[]>(result.parsedBody.value);
     }
 
-    public async createAuthorization(authorizationProviderName: string, authorizationId: string): Promise<IAuthorizationContract> {
+    public async putAuthorization(authorizationProviderName: string, authorizationId: string): Promise<IAuthorizationContract> {
         const client: ServiceClient = await createGenericClient(this.credentials);
         const result: HttpOperationResponse = await client.sendRequest({
             method: "PUT",
@@ -204,7 +204,7 @@ export class ApimService {
         return <IAuthorizationPermissionContract[]>(result.parsedBody.value);
     }
 
-    public async createAuthorizationPermission(authorizationProviderName: string, authorizationId: string, permissionName: string, objectId: string, tenantId: string): Promise<IAuthorizationPermissionContract> {
+    public async putAuthorizationPermission(authorizationProviderName: string, authorizationId: string, permissionName: string, objectId: string, tenantId: string): Promise<IAuthorizationPermissionContract> {
         const client: ServiceClient = await createGenericClient(this.credentials);
         const properties: IAuthorizationPermissionPropertyContract = {
             ObjectId: objectId,

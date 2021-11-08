@@ -62,7 +62,7 @@ export class AuthorizationPermissionsTreeItem extends AzureParentTreeItem<IAutho
             context.showCreatingTreeItem(permissionName);
             try {
                 const apimService = new ApimService(this.root.credentials, this.root.environment.resourceManagerEndpointUrl, this.root.subscriptionId, this.root.resourceGroupName, this.root.serviceName);
-                const permission = await apimService.createAuthorizationPermission(this.root.authorizationProviderName, this.root.authorizationName, context.permissionName, context.objectId, context.tenantId);
+                const permission = await apimService.putAuthorizationPermission(this.root.authorizationProviderName, this.root.authorizationName, context.permissionName, context.objectId, context.tenantId);
                 const message = `Successfully created permission "${permission.name}".`;
 
                 ext.outputChannel.show();
