@@ -9,7 +9,7 @@ import { createGenericClient } from "vscode-azureextensionui";
 import { 
     IAuthorizationContract, IGatewayApiContract, IGatewayContract, ILoginLinkRequestContract, ILoginLinkResponseContract, IMasterSubscription, 
     IAuthorizationProviderContract, IAuthorizationProviderPropertyContract, IAuthorizationPermissionContract, IAuthorizationPermissionPropertyContract,
-    IServiceProviderContract } from "./contracts";
+    IServiceProviderContract, IApimServiceContract} from "./contracts";
 
 export class ApimService {
     public baseUrl: string;
@@ -28,6 +28,19 @@ export class ApimService {
         this.subscriptionId = subscriptionId;
         this.resourceGroup = resourceGroup;
         this.serviceName = serviceName;
+    }
+
+    public async getService(): Promise<IApimServiceContract> {
+        const client: ServiceClient = await createGenericClient(this.credentials);
+        const result: HttpOperationResponse = await client.sendRequest({
+            method: "GET",
+            url: `${this.baseUrl}?api-version=${this.apiVersion}`
+        });
+        if (result.status >= 400) {
+            throw Error(result.parsedBody.error?.message);
+        }
+        // tslint:disable-next-line: no-unsafe-any
+        return <IApimServiceContract>(result.parsedBody);
     }
 
     public async listGateways(): Promise<IGatewayContract[]> {
@@ -105,6 +118,9 @@ export class ApimService {
             method: "GET",
             url: `${this.baseUrl}/serviceProviders?api-version=${this.authorizationProviderApiVersion}`
         });
+        if (result.status >= 400) {
+            throw Error(result.parsedBody.error?.message);
+        }
         // tslint:disable-next-line: no-unsafe-any
         return <IServiceProviderContract[]>(result.parsedBody.value);
     }
@@ -115,6 +131,9 @@ export class ApimService {
             method: "GET",
             url: `${this.baseUrl}/authorizationProviders?api-version=${this.authorizationProviderApiVersion}`
         });
+        if (result.status >= 400) {
+            throw Error(result.parsedBody.error?.message);
+        }
         // tslint:disable-next-line: no-unsafe-any
         return <IAuthorizationProviderContract[]>(result.parsedBody.value);
     }
@@ -143,6 +162,9 @@ export class ApimService {
             url: `${this.baseUrl}/authorizationProviders/${authorizationProviderName}?api-version=${this.authorizationProviderApiVersion}`,
             body: { properties: properties }
         });
+        if (result.status >= 400) {
+            throw Error(result.parsedBody.error?.message);
+        }
         // tslint:disable-next-line: no-unsafe-any
         return <IAuthorizationProviderContract>(result.parsedBody);
     }
@@ -161,6 +183,9 @@ export class ApimService {
             method: "GET",
             url: `${this.baseUrl}/authorizationProviders/${authorizationProviderName}/authorizations?api-version=${this.authorizationProviderApiVersion}`
         });
+        if (result.status >= 400) {
+            throw Error(result.parsedBody.error?.message);
+        }
         // tslint:disable-next-line: no-unsafe-any
         return <IAuthorizationContract[]>(result.parsedBody.value);
     }
@@ -172,6 +197,9 @@ export class ApimService {
             url: `${this.baseUrl}/authorizationProviders/${authorizationProviderName}/authorizations/${authorizationId}?api-version=${this.authorizationProviderApiVersion}`,
             body: {}
         });
+        if (result.status >= 400) {
+            throw Error(result.parsedBody.error?.message);
+        }
         // tslint:disable-next-line: no-unsafe-any
         return <IAuthorizationContract>(result.parsedBody);
     }
@@ -191,6 +219,9 @@ export class ApimService {
             url: `${this.baseUrl}/authorizationProviders/${authorizationProviderName}/authorizations/${authorizationId}/getLoginLinks?api-version=${this.authorizationProviderApiVersion}`,
             body: body
         });
+        if (result.status >= 400) {
+            throw Error(result.parsedBody.error?.message);
+        }
         // tslint:disable-next-line: no-unsafe-any
         return <ILoginLinkResponseContract>(result.parsedBody);
     }
@@ -201,6 +232,9 @@ export class ApimService {
             method: "GET",
             url: `${this.baseUrl}/authorizationProviders/${authorizationProviderName}/authorizations/${authorizationName}/permissions?api-version=${this.authorizationProviderApiVersion}`
         });
+        if (result.status >= 400) {
+            throw Error(result.parsedBody.error?.message);
+        }
         // tslint:disable-next-line: no-unsafe-any
         return <IAuthorizationPermissionContract[]>(result.parsedBody.value);
     }
@@ -216,6 +250,10 @@ export class ApimService {
             url: `${this.baseUrl}/authorizationProviders/${authorizationProviderName}/authorizations/${authorizationId}/permissions/${permissionName}?api-version=${this.authorizationProviderApiVersion}`,
             body: { properties: properties }
         });
+        
+        if (result.status >= 400) {
+            throw Error(result.parsedBody.error?.message);
+        }
         // tslint:disable-next-line: no-unsafe-any
         return <IAuthorizationPermissionContract>(result.parsedBody);
     }
