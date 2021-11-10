@@ -29,7 +29,7 @@ export class AuthorizationPermissionTreeItem extends AzureTreeItem<IAuthorizatio
     }
 
     public get description(): string | undefined {
-        return this.authorizationPermissionContract.properties.ObjectId;
+        return this.authorizationPermissionContract.properties.objectId;
     }
 
     public get iconPath(): { light: string, dark: string } {

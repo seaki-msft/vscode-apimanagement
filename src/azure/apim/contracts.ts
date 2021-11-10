@@ -48,17 +48,17 @@ export interface IServiceProvidersContract {
 }
 
 export interface IServiceProviderContract {
-    Id: string;
-    DisplayName: string;
-    AuthenticationType: string;
-    Parameters: IServiceProviderParameterContract[];
+    id: string;
+    displayName: string;
+    authenticationType: string;
+    parameters: IServiceProviderParameterContract[];
 }
 
 export interface IServiceProviderParameterContract {
-    Name: string;
-    DisplayName: string;
-    Description: string;
-    Default: string;
+    name: string;
+    displayName: string;
+    description: string;
+    default: string;
 }
 
 export interface IAuthorizationProviderContract {
@@ -73,12 +73,12 @@ export interface IAuthorizationProviderContract {
 export interface IAuthorizationProviderPropertyContract {
     displayName: string;
     identityProvider: string;
-    OAuthSettings: {
-        ClientId: string;
-        ClientSecret: string;
-        Scopes?: string;
-        RedirectUrl?: string;
-        Parameters?: {}
+    oauthSettings: {
+        clientId: string;
+        clientSecret: string;
+        scopes?: string;
+        redirectUrl?: string;
+        parameters?: {}
     };
 }
 
@@ -92,10 +92,10 @@ export interface IAuthorizationContract {
 }
 
 export interface IAuthorizationPropertyContract {
-    Status: string; // TODO(seaki): switch to enum?
-    Error: {
-        Code: string;
-        Message: string;
+    status: string; // TODO(seaki): switch to enum?
+    error: {
+        code: string;
+        message: string;
     };
 }
 
@@ -109,8 +109,8 @@ export interface IAuthorizationPermissionContract {
 }
 
 export interface IAuthorizationPermissionPropertyContract {
-    ObjectId: string;
-    TenantId: string;
+    objectId: string;
+    tenantId: string;
 }
 
 export interface ILoginLinkRequestContract {
@@ -118,5 +118,5 @@ export interface ILoginLinkRequestContract {
 }
 
 export interface ILoginLinkResponseContract {
-    LoginLink: string;
+    loginLink: string;
 }

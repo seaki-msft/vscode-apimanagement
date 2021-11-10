@@ -61,24 +61,24 @@ export class AuthorizationProvidersTreeItem extends AzureParentTreeItem<IService
     }
 
     public async createChildImpl(context: IAuthorizationProviderTreeItemContext): Promise<AuthorizationProviderTreeItem> {
-        var defaultParamNames = [ "ClientId", "ClientSecret", "Scopes" ];
+        var defaultParamNames = [ "clientId", "clientSecret", "scopes" ];
         
         var hasRequiredParam = true;
         for (var defaultParamName of defaultParamNames) {
-            // TODO(seaki): delete second half
-            if (context.parameters[defaultParamName] === undefined && (context.parameters["scopes"] === undefined)) {
+            if (context[defaultParamName] === undefined) {
                 hasRequiredParam = false;
             }
         }
 
-        if (hasRequiredParam && context.authorizationProviderName) {
+        if (hasRequiredParam && !!context.authorizationProviderName) {
             const authorizationProviderName = context.authorizationProviderName;
             context.showCreatingTreeItem(authorizationProviderName);
             try {
                 const apimService = new ApimService(this.root.credentials, this.root.environment.resourceManagerEndpointUrl, this.root.subscriptionId, this.root.resourceGroupName, this.root.serviceName);
-                const authorizationProvider = await apimService.createAuthorizationProvider(context.authorizationProviderName, context.identityProvider, context.parameters);
+                const authorizationProvider = await apimService.createAuthorizationProvider(
+                    context.authorizationProviderName, context.identityProvider, context.clientId, context.clientSecret, context.scopes, context.parameters);
                 const message = `Successfully created authorization provider "${authorizationProvider.name}". 
-Please add redirect uri '${authorizationProvider.properties.OAuthSettings.RedirectUrl}' to the OAuth application before authorizing an authorization.`;
+Please add redirect uri '${authorizationProvider.properties.oauthSettings.redirectUrl}' to the OAuth application before authorizing an authorization.`;
 
                 ext.outputChannel.show();
                 ext.outputChannel.appendLine(message);

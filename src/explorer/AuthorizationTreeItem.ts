@@ -43,7 +43,7 @@ export class AuthorizationTreeItem extends AzureParentTreeItem<IAuthorizationPro
     }
 
     public get description(): string | undefined {
-        return this.authorizationContract.properties.Status;
+        return this.authorizationContract.properties.status;
     }
 
     public get iconPath(): { light: string, dark: string } {

@@ -119,22 +119,23 @@ export class ApimService {
         return <IAuthorizationProviderContract[]>(result.parsedBody.value);
     }
 
-    public async createAuthorizationProvider(authorizationProviderName:string, identityProvider: string, parameters : {[name: string]: string;} = {}): Promise<IAuthorizationProviderContract> {
+    public async createAuthorizationProvider(
+        authorizationProviderName:string, 
+        identityProvider: string, 
+        clientId: string,
+        clientSecret: string,
+        scopes: string,
+        parameters : {[name: string]: string;} = {}): Promise<IAuthorizationProviderContract> {
         const client: ServiceClient = await createGenericClient(this.credentials);
-
-        // TODO(seaki): lowercase
-        const clientId = parameters.ClientId;
-        const clientSecret = parameters.ClientSecret;
-        const scopes = parameters.scopes;
 
         const properties: IAuthorizationProviderPropertyContract = {
             displayName: authorizationProviderName,
             identityProvider: identityProvider,
-            OAuthSettings : {
-                ClientId: clientId,
-                ClientSecret: clientSecret,
-                Scopes: scopes,
-                Parameters : parameters
+            oauthSettings : {
+                clientId: clientId,
+                clientSecret: clientSecret,
+                scopes: scopes,
+                parameters : parameters
             }
         }
         const result: HttpOperationResponse = await client.sendRequest({
@@ -207,8 +208,8 @@ export class ApimService {
     public async createAuthorizationPermission(authorizationProviderName: string, authorizationId: string, permissionName: string, objectId: string, tenantId: string): Promise<IAuthorizationPermissionContract> {
         const client: ServiceClient = await createGenericClient(this.credentials);
         const properties: IAuthorizationPermissionPropertyContract = {
-            ObjectId: objectId,
-            TenantId: tenantId
+            objectId: objectId,
+            tenantId: tenantId
         }
         const result: HttpOperationResponse = await client.sendRequest({
             method: "PUT",

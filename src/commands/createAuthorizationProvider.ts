@@ -24,19 +24,26 @@ export async function createAuthorizationProvider(context: IActionContext & Part
     const apimService = new ApimService(node.root.credentials, node.root.environment.resourceManagerEndpointUrl, node.root.subscriptionId, node.root.resourceGroupName, node.root.serviceName);
     // TODO(seaki): add caching
     const options = await apimService.listServiceProviders();
-    const choice = await ext.ui.showQuickPick(options.map((s) => { return { label: s.Id, description: '', detail: '' }; }), { placeHolder: 'Select Identity Provider ...', canPickMany: false });
+    const choice = await ext.ui.showQuickPick(options.map((s) => { return { label: s.id, description: '', detail: '' }; }), { placeHolder: 'Select Identity Provider ...', canPickMany: false });
 
-    const selectedIdentityProvider = options.find(s => s.Id == choice.label)!;
+    const selectedIdentityProvider = options.find(s => s.id == choice.label)!;
     context.identityProvider = choice.label;
 
     const parameters: IParameterValues = {};
-    for (var param of selectedIdentityProvider?.Parameters) {
-        parameters[param.Name] = await askIdentityProviderParameterInput(param);
+
+    // Required parameters
+    const requiredParamIds = [ "clientId", "clientSecret", "scopes" ];
+    const requiredParamNames = [ "Client Id", "Client Secret", "Scopes" ];
+    for (var idx=0; idx<requiredParamIds.length; idx++) {
+        var paramId = requiredParamIds[idx];
+        var paramName = requiredParamNames[idx];
+        context[paramId] = await askInput(`Enter ${paramName}...`);
     }
 
-    // Some IDPs don't have scopes. Ask explicitly if so
-    if (selectedIdentityProvider?.Parameters.findIndex(p => p.Name == "scopes") == -1) {
-        parameters["scopes"] = await askInput("Enter scopes...");
+    for (var param of selectedIdentityProvider?.parameters) {
+        if (requiredParamIds.findIndex(p => p.toLowerCase() == param.name.toLowerCase()) == -1) {
+            parameters[param.name] = await askIdentityProviderParameterInput(param);
+        }
     }
 
     context.parameters = parameters;
@@ -57,13 +64,13 @@ export async function createAuthorizationProvider(context: IActionContext & Part
 }
 
 async function askIdentityProviderParameterInput(param: IServiceProviderParameterContract) : Promise<string> {
-    var promptString = `Enter ${param.DisplayName}... `;
+    var promptString = `Enter ${param.displayName}... `;
     var additional = "("
-    if (!!param.Description) {
-        additional += `${param.Description}. `; 
+    if (!!param.description) {
+        additional += `${param.description}. `; 
     } 
-    if (!!param.Default) {
-        additional += `Default is ${param.Default}`;
+    if (!!param.default) {
+        additional += `Default is '${param.default}'`;
     }
     additional += ")";
     if (additional.length > 2) {
@@ -72,7 +79,7 @@ async function askIdentityProviderParameterInput(param: IServiceProviderParamete
 
     var value = await askInput(promptString);
     if (!value) {
-        value = param.Default;
+        value = param.default;
     }
     return value;
 }

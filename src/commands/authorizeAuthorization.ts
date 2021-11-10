@@ -26,5 +26,5 @@ export async function authorizeAuthorization(context: IActionContext, node?: Aut
     };
 
     const loginLinkResponse = await apimService.getLoginLink(node.root.authorizationProviderName, node.authorizationContract.name, requestBody);
-    vscode.env.openExternal(vscode.Uri.parse(loginLinkResponse.LoginLink));
+    vscode.env.openExternal(vscode.Uri.parse(loginLinkResponse.loginLink));
 }
