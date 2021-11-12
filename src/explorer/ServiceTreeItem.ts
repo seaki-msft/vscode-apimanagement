@@ -80,7 +80,7 @@ export class ServiceTreeItem extends AzureParentTreeItem<IServiceTreeRoot> {
 
     public async loadMoreChildrenImpl(): Promise<AzureTreeItem<IServiceTreeRoot>[]> {
         if (this.gatewaysTreeItem === undefined) {
-            return [this.apisTreeItem, this.namedValuesTreeItem, this.productsTreeItem, this.servicePolicyTreeItem, this.subscriptionsTreeItem];
+            return [this.apisTreeItem, this.namedValuesTreeItem, this.productsTreeItem, this.servicePolicyTreeItem, this.subscriptionsTreeItem, this.authorizationProvidersTreeItem];
         }
         return [this.apisTreeItem, this.namedValuesTreeItem, this.productsTreeItem, this.servicePolicyTreeItem, this.gatewaysTreeItem, this.subscriptionsTreeItem, this.authorizationProvidersTreeItem];
     }
