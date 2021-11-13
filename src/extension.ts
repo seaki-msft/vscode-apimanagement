@@ -11,7 +11,7 @@ import { AzExtTreeDataProvider, AzureParentTreeItem, AzureTreeItem, AzureUserInp
 import { addApiFilter } from './commands/addApiFilter';
 import { addApiToGateway } from './commands/addApiToGateway';
 import { addApiToProduct } from './commands/addApiToProduct';
-import { authorizeAuthorization } from './commands/authorizeAuthorization';
+import { authorizeAuthorization, authorizeAuthorizationCallback, authorizeAuthorizationCallbackPath } from './commands/authorizeAuthorization';
 import { copyAuthorizationPolicy } from './commands/copyAuthorizationPolicy';
 import { copySubscriptionKey } from './commands/copySubscriptionKey';
 import { createAuthorization } from './commands/createAuthorization';
@@ -72,7 +72,6 @@ import { AuthorizationProviderTreeItem } from './explorer/AuthorizationProviderT
 import { AuthorizationPermissionsTreeItem } from './explorer/AuthorizationPermissionsTreeItem';
 import { AuthorizationPermissionTreeItem } from './explorer/AuthorizationPermissionTreeItem';
 import { ext } from './extensionVariables';
-import { localize } from './localize';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -104,8 +103,7 @@ export async function activateInternal(context: vscode.ExtensionContext) {
             vscode.window.registerUriHandler(handler)
         );
 
-        activate(context); // activeta debug context
-
+        activate(context); // activate debug context
     });
 }
 
@@ -283,8 +281,9 @@ function registerEditors(context: vscode.ExtensionContext) : void {
 export function deactivateInternal() {}
 
 class UriEventHandler extends vscode.EventEmitter<vscode.Uri> implements vscode.UriHandler {
-    public handleUri() {
-        ext.outputChannel.appendLine(localize('oauthFlowComplete', "OAuth flow completed."));
-        vscode.window.showInformationMessage(localize('authSuccess', 'Authorization complete. You can now close the browser window that was launched during the authorization process.'));
+    public handleUri(uri: vscode.Uri) {
+        if (uri.path.indexOf(authorizeAuthorizationCallbackPath) > -1) {
+            authorizeAuthorizationCallback(uri.query);
+        }
     }
 }
