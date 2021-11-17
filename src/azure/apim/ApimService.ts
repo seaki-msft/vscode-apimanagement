@@ -191,6 +191,8 @@ export class ApimService {
     }
 
     public async createAuthorization(authorizationProviderName: string, authorizationId: string): Promise<IAuthorizationContract> {
+        // TODO(seaki): until managed identity is not required, automatically turn on managed identity
+
         const client: ServiceClient = await createGenericClient(this.credentials);
         const result: HttpOperationResponse = await client.sendRequest({
             method: "PUT",
