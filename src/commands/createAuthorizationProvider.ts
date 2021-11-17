@@ -23,10 +23,10 @@ export async function createAuthorizationProvider(context: IActionContext & Part
 
     const apimService = new ApimService(node.root.credentials, node.root.environment.resourceManagerEndpointUrl, node.root.subscriptionId, node.root.resourceGroupName, node.root.serviceName);
     // TODO(seaki): add caching
-    const options = await apimService.listServiceProviders();
-    const choice = await ext.ui.showQuickPick(options.map((s) => { return { label: s.id, description: '', detail: '' }; }), { placeHolder: 'Select Identity Provider ...', canPickMany: false });
+    const options = (await apimService.listServiceProviders()).sort((s1, s2) => s1.displayName.localeCompare(s2.displayName));
+    const choice = await ext.ui.showQuickPick(options.map((s) => { return { label: s.displayName, description: '', detail: '' }; }), { placeHolder: 'Select Identity Provider ...', canPickMany: false });
 
-    const selectedIdentityProvider = options.find(s => s.id == choice.label)!;
+    const selectedIdentityProvider = options.find(s => s.displayName == choice.label)!;
     context.identityProvider = choice.label;
 
     const parameters: IParameterValues = {};
@@ -65,29 +65,22 @@ export async function createAuthorizationProvider(context: IActionContext & Part
 
 async function askIdentityProviderParameterInput(param: IServiceProviderParameterContract) : Promise<string> {
     var promptString = `Enter ${param.displayName}... `;
-    var additional = "("
     if (!!param.description) {
-        additional += `${param.description}. `; 
+        promptString += `(${param.description})`; 
     } 
-    if (!!param.default) {
-        additional += `Default is '${param.default}'`;
-    }
-    additional += ")";
-    if (additional.length > 2) {
-        promptString += additional;
-    }
 
-    var value = await askInput(promptString);
+    var value = await askInput(promptString, param.default);
     if (!value) {
         value = param.default;
     }
     return value;
 }
 
-async function askInput(message: string) : Promise<string> {
+async function askInput(message: string, value?: string) : Promise<string> {
     const idPrompt: string = localize('value', message);
     return (await ext.ui.showInputBox({
-        prompt: idPrompt
+        prompt: idPrompt,
+        value: value
     })).trim();
 }
 
