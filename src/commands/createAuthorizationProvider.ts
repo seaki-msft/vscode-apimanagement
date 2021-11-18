@@ -27,7 +27,7 @@ export async function createAuthorizationProvider(context: IActionContext & Part
     const choice = await ext.ui.showQuickPick(options.map((s) => { return { label: s.displayName, description: '', detail: '' }; }), { placeHolder: 'Select Identity Provider ...', canPickMany: false });
 
     const selectedIdentityProvider = options.find(s => s.displayName == choice.label)!;
-    context.identityProvider = choice.label;
+    context.identityProvider = selectedIdentityProvider.id;
 
     const parameters: IParameterValues = {};
 
@@ -42,7 +42,10 @@ export async function createAuthorizationProvider(context: IActionContext & Part
 
     for (var param of selectedIdentityProvider?.parameters) {
         if (requiredParamIds.findIndex(p => p.toLowerCase() == param.name.toLowerCase()) == -1) {
-            parameters[param.name] = await askIdentityProviderParameterInput(param);
+            // For AAD, skip parameters other than resourceUri
+            if (selectedIdentityProvider.id != "aad" || param.name.toLowerCase() == "resourceuri") {
+                parameters[param.name] = await askIdentityProviderParameterInput(param);
+            }
         }
     }
 
