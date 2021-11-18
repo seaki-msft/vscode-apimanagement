@@ -43,6 +43,20 @@ export class ApimService {
         return <IApimServiceContract>(result.parsedBody);
     }
 
+    public async turnOnManagedIdentity(): Promise<IApimServiceContract> {
+        const client: ServiceClient = await createGenericClient(this.credentials);
+        const result: HttpOperationResponse = await client.sendRequest({
+            method: "PATCH",
+            url: `${this.baseUrl}?api-version=${this.apiVersion}`,
+            body: { identity : { type: "systemassigned" } }
+        });
+        if (result.status >= 400) {
+            throw Error(result.parsedBody.error?.message);
+        }
+        // tslint:disable-next-line: no-unsafe-any
+        return <IApimServiceContract>(result.parsedBody);
+    }
+
     public async listGateways(): Promise<IGatewayContract[]> {
         const client: ServiceClient = await createGenericClient(this.credentials);
         const result: HttpOperationResponse = await client.sendRequest({

@@ -85,6 +85,16 @@ Please add redirect uri '${authorizationProvider.properties.oauthSettings.redire
                 
                 window.showInformationMessage(localize("createdAuthorizationProvider", message));
 
+                // Turn on managed identity asynchronously if needed. TODO: temporarily until managed identity restriction is lifted
+                const service = await apimService.getService();
+                if (!service.identity) {
+                    await apimService.turnOnManagedIdentity();
+                    var message1 = "Automatically enabled managed identity";
+                    ext.outputChannel.show();
+                    ext.outputChannel.appendLine(message1);
+                    window.showInformationMessage(localize("enabledManagedIdentity", message1));
+                }
+
                 return new AuthorizationProviderTreeItem(this, authorizationProvider);
 
             } catch (error) {
