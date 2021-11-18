@@ -43,7 +43,7 @@ export async function createAuthorizationProvider(context: IActionContext & Part
     for (var param of selectedIdentityProvider?.parameters) {
         if (requiredParamIds.findIndex(p => p.toLowerCase() == param.name.toLowerCase()) == -1) {
             // For AAD, skip parameters other than resourceUri
-            if (selectedIdentityProvider.id != "aad" || param.name.toLowerCase() == "resourceuri") {
+            if (selectedIdentityProvider.id != "aad" || !param.default) {
                 parameters[param.name] = await askIdentityProviderParameterInput(param);
             }
         }

@@ -31,7 +31,7 @@ export async function createAuthorizationPermission(context: IActionContext & Pa
     if (identitySelected.label == otherManagedIdentitiesOptionLabel) {
         var otherManagedIdentityOptions = await populateOtherManageIdentityOptions(node.root.credentials, node.root.environment.resourceManagerEndpointUrl, node.root.subscriptionId);
         var managedIdentitySelected = await ext.ui.showQuickPick(
-            otherManagedIdentityOptions, { placeHolder: 'Select Managed Identity ...', canPickMany: false });
+            otherManagedIdentityOptions, { placeHolder: 'Select Managed Identity ...', canPickMany: false, suppressPersistence: true });
         var permissionName = managedIdentitySelected.label;
         var oid = managedIdentitySelected.description!;
     }
