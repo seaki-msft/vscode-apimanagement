@@ -6,6 +6,7 @@
 import { AzExtTreeItem, AzureParentTreeItem, ICreateChildImplContext } from "vscode-azureextensionui";
 import { ApimService } from "../azure/apim/ApimService";
 import { IAuthorizationContract } from "../azure/apim/contracts";
+import { authorizeAuthorization } from "../commands/authorizeAuthorization";
 import { localize } from "../localize";
 import { processError } from "../utils/errorUtil";
 import { treeUtils } from "../utils/treeUtils";
@@ -58,10 +59,18 @@ export class AuthorizationsTreeItem extends AzureParentTreeItem<IAuthorizationPr
             context.showCreatingTreeItem(authorizationName);
 
             try {
-                const apimService = new ApimService(this.root.credentials, this.root.environment.resourceManagerEndpointUrl, this.root.subscriptionId, this.root.resourceGroupName, this.root.serviceName);
+                const apimService = new ApimService(this.root.credentials, this.root.environment.resourceManagerEndpointUrl, this.root.subscriptionId, this.root.resourceGroupName, this.root.serviceName);                
                 const authorization = await apimService.createAuthorization(this.root.authorizationProviderName, authorizationName);
-                return new AuthorizationTreeItem(this, authorization);
 
+                // Automatically create permission for logged in user
+                const token = await this.root.credentials.getToken();
+                if (!!token) {
+                    await apimService.createAuthorizationPermission(this.root.authorizationProviderName, authorizationName, token.userId!, token.oid!, token.tenantId!)
+                }
+
+                var node = new AuthorizationTreeItem(this, authorization);
+                await authorizeAuthorization(context, node); // automatically start authorization flow
+                return node;
             } catch (error) {
                 throw new Error(processError(error, localize("createAuthorization", `Failed to add authorization '${authorizationName}' to authorizationProvider '${this.root.authorizationProviderName}'.`)));
             }
