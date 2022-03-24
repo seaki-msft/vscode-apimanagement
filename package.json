@@ -2,7 +2,7 @@
     "name": "vscode-apimanagement",
     "displayName": "Azure API Management",
     "description": "An Azure API Management extension for Visual Studio Code.",
-    "version": "1.0.3",
+    "version": "1.0.3-tokenstore",
     "publisher": "ms-azuretools",
     "icon": "resources/apim-icon-newone.png",
     "aiKey": "AIF-d9b70cd4-b9f9-4d70-929b-a071c400b217",
@@ -74,7 +74,15 @@
         "onCommand:azureApiManagement.revisions",
         "onCommand:azureApiManagement.setCustomHostName",
         "onCommand:azureApiManagement.createSubscription",
-        "onCommand:azureApiManagement.deleteSubscription"
+        "onCommand:azureApiManagement.deleteSubscription",
+        "onCommand:azureApiManagement.createAuthorizationProvider",
+        "onCommand:azureApiManagement.deleteAuthorizationProvider",
+        "onCommand:azureApiManagement.createAuthorization",
+        "onCommand:azureApiManagement.deleteAuthorization",
+        "onCommand:azureApiManagement.authorizeAuthorization",
+        "onCommand:azureApiManagement.copyAuthorizationPolicy",
+        "onCommand:azureApiManagement.createAuthorizationPermission",
+        "onCommand:azureApiManagement.deleteAuthorizationPermission"
     ],
     "main": "main",
     "contributes": {
@@ -385,6 +393,46 @@
                     "light": "resources/light/diff.svg",
                     "dark": "resources/dark/diff.svg"
                 }
+            },
+            {
+                "command": "azureApiManagement.createAuthorizationProvider",
+                "title": "%azureApiManagement.createAuthorizationProvider%",
+                "category": "Azure API Management"
+            },
+            {
+                "command": "azureApiManagement.deleteAuthorizationProvider",
+                "title": "%azureApiManagement.deleteAuthorizationProvider%",
+                "category": "Azure API Management"
+            },
+            {
+                "command": "azureApiManagement.createAuthorization",
+                "title": "%azureApiManagement.createAuthorization%",
+                "category": "Azure API Management"
+            },
+            {
+                "command": "azureApiManagement.deleteAuthorization",
+                "title": "%azureApiManagement.deleteAuthorization%",
+                "category": "Azure API Management"
+            },
+            {
+                "command": "azureApiManagement.authorizeAuthorization",
+                "title": "%azureApiManagement.authorizeAuthorization%",
+                "category": "Azure API Management"
+            },
+            {
+                "command": "azureApiManagement.copyAuthorizationPolicy",
+                "title": "%azureApiManagement.copyAuthorizationPolicy%",
+                "category": "Azure API Management"
+            },
+            {
+                "command": "azureApiManagement.createAuthorizationPermission",
+                "title": "%azureApiManagement.createAuthorizationPermission%",
+                "category": "Azure API Management"
+            },
+            {
+                "command": "azureApiManagement.deleteAuthorizationPermission",
+                "title": "%azureApiManagement.deleteAuthorizationPermission%",
+                "category": "Azure API Management"
             }
         ],
         "viewsContainers": {
@@ -635,6 +683,61 @@
                     "command": "azureApiManagement.deleteSubscription",
                     "when": "view == azureApiManagementExplorer && viewItem == azureApiManagementSubscriptionTreeItem",
                     "group": "1@1"
+                },
+                {
+                    "command": "azureApiManagement.createAuthorizationProvider",
+                    "when": "view == azureApiManagementExplorer && viewItem == azureApiManagementAuthorizationProviders",
+                    "group": "1@1"
+                },
+                {
+                    "command": "azureApiManagement.Refresh",
+                    "when": "view == azureApiManagementExplorer && viewItem == azureApiManagementAuthorizationProviders",
+                    "group": "1@2"
+                },
+                {
+                    "command": "azureApiManagement.deleteAuthorizationProvider",
+                    "when": "view == azureApiManagementExplorer && viewItem == azureApiManagementAuthorizationProvider",
+                    "group": "2@1"
+                },
+                {
+                    "command": "azureApiManagement.createAuthorization",
+                    "when": "view == azureApiManagementExplorer && viewItem == azureApiManagementAuthorizations",
+                    "group": "1@1"
+                },
+                {
+                    "command": "azureApiManagement.Refresh",
+                    "when": "view == azureApiManagementExplorer && viewItem == azureApiManagementAuthorizations",
+                    "group": "1@2"
+                },
+                {
+                    "command": "azureApiManagement.authorizeAuthorization",
+                    "when": "view == azureApiManagementExplorer && viewItem == azureApiManagementAuthorization",
+                    "group": "1@1"
+                },
+                {
+                    "command": "azureApiManagement.copyAuthorizationPolicy",
+                    "when": "view == azureApiManagementExplorer && viewItem == azureApiManagementAuthorization",
+                    "group": "1@2"
+                },
+                {
+                    "command": "azureApiManagement.deleteAuthorization",
+                    "when": "view == azureApiManagementExplorer && viewItem == azureApiManagementAuthorization",
+                    "group": "2@1"
+                },
+                {
+                    "command": "azureApiManagement.createAuthorizationPermission",
+                    "when": "view == azureApiManagementExplorer && viewItem == azureApiManagementAuthorizationPermissions",
+                    "group": "1@1"
+                },
+                {
+                    "command": "azureApiManagement.Refresh",
+                    "when": "view == azureApiManagementExplorer && viewItem == azureApiManagementAuthorizationPermissions",
+                    "group": "1@2"
+                },
+                {
+                    "command": "azureApiManagement.deleteAuthorizationPermission",
+                    "when": "view == azureApiManagementExplorer && viewItem == azureApiManagementAuthorizationPermission",
+                    "group": "2@1"
                 }
             ]
         },
@@ -721,6 +824,7 @@
         "@types/xml": "^1.0.4",
         "adal-node": "^0.2.2",
         "await-notify": "1.0.1",
+        "Buffer": "^0.0.0",
         "decompress": "^4.2.1",
         "fs-extra": "^4.0.2",
         "guid-typescript": "^1.0.9",

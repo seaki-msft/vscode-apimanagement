@@ -509,5 +509,15 @@
             "\t</xsl:stylesheet>",
             "</xsl-transform>"
         ]
+    },
+    "get-authorization-context": {
+        "prefix": "get-authorization-context",
+        "description": "Acquires access token for a authorization using authorizationProvider. Use in the inbound sections at API or Operation scopes.",
+        "body": [
+            "<get-authorization-context authorization-provider-id=\"$1\" authorization-id=\"$2\" variable-name=\"authContext\" />",
+            "<set-header name=\"Authorization\" exists-action=\"override\">",
+            "\t<value>Bearer @((Authorization)@(((Authorization)context.Variables.GetValueOrDefault(\"authContext\"))?.AccessToken)</value>",
+            "</set-header>"
+        ]
     }
 }

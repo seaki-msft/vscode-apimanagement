@@ -11,8 +11,13 @@ import { AzExtTreeDataProvider, AzureParentTreeItem, AzureTreeItem, AzureUserInp
 import { addApiFilter } from './commands/addApiFilter';
 import { addApiToGateway } from './commands/addApiToGateway';
 import { addApiToProduct } from './commands/addApiToProduct';
+import { authorizeAuthorization, authorizeAuthorizationCallback, authorizeAuthorizationCallbackPath } from './commands/authorizeAuthorization';
+import { copyAuthorizationPolicy } from './commands/copyAuthorizationPolicy';
 import { copySubscriptionKey } from './commands/copySubscriptionKey';
+import { createAuthorization } from './commands/createAuthorization';
 import { createService } from './commands/createService';
+import { createAuthorizationPermission } from './commands/createAuthorizationPermission'
+import { createAuthorizationProvider } from './commands/createAuthorizationProvider'
 import { debugPolicy } from './commands/debugPolicies/debugPolicy';
 import { deleteNode } from './commands/deleteNode';
 import { copyDockerRunCommand, generateKubernetesDeployment } from './commands/deployGateway';
@@ -39,6 +44,8 @@ import { ApiPolicyTreeItem } from './explorer/ApiPolicyTreeItem';
 import { ApisTreeItem } from './explorer/ApisTreeItem';
 import { ApiTreeItem } from './explorer/ApiTreeItem';
 import { AzureAccountTreeItem } from './explorer/AzureAccountTreeItem';
+import { AuthorizationsTreeItem } from './explorer/AuthorizationsTreeItem';
+import { AuthorizationTreeItem } from './explorer/AuthorizationTreeItem';
 import { ApiResourceEditor } from './explorer/editors/arm/ApiResourceEditor';
 import { OperationResourceEditor } from './explorer/editors/arm/OperationResourceEditor';
 import { ProductResourceEditor } from './explorer/editors/arm/ProductResourceEditor';
@@ -60,6 +67,10 @@ import { ProductTreeItem } from './explorer/ProductTreeItem';
 import { ServicePolicyTreeItem } from './explorer/ServicePolicyTreeItem';
 import { ServiceTreeItem } from './explorer/ServiceTreeItem';
 import { SubscriptionTreeItem } from './explorer/SubscriptionTreeItem';
+import { AuthorizationProvidersTreeItem } from './explorer/AuthorizationProvidersTreeItem';
+import { AuthorizationProviderTreeItem } from './explorer/AuthorizationProviderTreeItem';
+import { AuthorizationPermissionsTreeItem } from './explorer/AuthorizationPermissionsTreeItem';
+import { AuthorizationPermissionTreeItem } from './explorer/AuthorizationPermissionTreeItem';
 import { ext } from './extensionVariables';
 
 // this method is called when your extension is activated
@@ -86,8 +97,13 @@ export async function activateInternal(context: vscode.ExtensionContext) {
 
         registerCommands(ext.tree);
         registerEditors(context);
-        activate(context); // activeta debug context
 
+        const handler = new UriEventHandler();
+        context.subscriptions.push(
+            vscode.window.registerUriHandler(handler)
+        );
+
+        activate(context); // activate debug context
     });
 }
 
@@ -133,6 +149,15 @@ function registerCommands(tree: AzExtTreeDataProvider): void {
     registerCommand('azureApiManagement.setCustomHostName', setCustomHostName);
     registerCommand('azureApiManagement.createSubscription', createSubscription);
     registerCommand('azureApiManagement.deleteSubscription', async (context: IActionContext, node?: AzureTreeItem) => await deleteNode(context, SubscriptionTreeItem.contextValue, node));
+
+    registerCommand('azureApiManagement.createAuthorizationProvider', async (context: IActionContext, node?: AuthorizationProvidersTreeItem) => { await createAuthorizationProvider(context, node); });
+    registerCommand('azureApiManagement.deleteAuthorizationProvider', async (context: IActionContext, node?: AzureTreeItem) => await deleteNode(context, AuthorizationProviderTreeItem.contextValue, node));
+    registerCommand('azureApiManagement.deleteAuthorization', async (context: IActionContext, node?: AzureTreeItem) => await deleteNode(context, AuthorizationTreeItem.contextValue, node));
+    registerCommand('azureApiManagement.createAuthorization', async (context: IActionContext, node?: AuthorizationsTreeItem) => { await createAuthorization(context, node); });
+    registerCommand('azureApiManagement.authorizeAuthorization', async (context: IActionContext, node?: AuthorizationTreeItem) => { await authorizeAuthorization(context, node); });
+    registerCommand('azureApiManagement.copyAuthorizationPolicy', async (context: IActionContext, node?: AuthorizationTreeItem) => { await copyAuthorizationPolicy(context, node); });
+    registerCommand('azureApiManagement.createAuthorizationPermission', async (context: IActionContext, node?: AuthorizationPermissionsTreeItem) => { await createAuthorizationPermission(context, node); });
+    registerCommand('azureApiManagement.deleteAuthorizationPermission', async (context: IActionContext, node?: AuthorizationPermissionTreeItem) => { await deleteNode(context, AuthorizationPermissionTreeItem.contextValue, node); });
 }
 
 // tslint:disable-next-line: max-func-body-length
@@ -254,3 +279,11 @@ function registerEditors(context: vscode.ExtensionContext) : void {
 // tslint:disable:typedef
 // tslint:disable-next-line:no-empty
 export function deactivateInternal() {}
+
+class UriEventHandler extends vscode.EventEmitter<vscode.Uri> implements vscode.UriHandler {
+    public handleUri(uri: vscode.Uri) {
+        if (uri.path.indexOf(authorizeAuthorizationCallbackPath) > -1) {
+            authorizeAuthorizationCallback(uri.query);
+        }
+    }
+}
